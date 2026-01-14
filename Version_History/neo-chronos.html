@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neo-Chronos | Time Tracking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0a0a0a;
+            --accent-cyan: #00f2ff;
+            --accent-glow: rgba(0, 242, 255, 0.4);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: 0.5s;
+        }
+
+        .glass-panel:hover::before {
+            left: 100%;
+        }
+
+        .timer-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .neo-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(10, 10, 10, 0.8);
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 0 15px var(--accent-glow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+        }
+
+        .neo-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        .neo-button.active {
+            animation: pulse-glow 2s infinite;
+            border-color: #ff0055;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+        }
+
+        @keyframes pulse-glow {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); }
+            50% { transform: scale(1.02); box-shadow: 0 0 40px rgba(255, 0, 85, 0.6); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); }
+        }
+
+        .timeline-container {
+            width: 100%;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid var(--glass-border);
+            position: absolute;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .timeline-bar {
+            flex-grow: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .time-block {
+            position: absolute;
+            height: 100%;
+            background: var(--accent-cyan);
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .mission-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--glass-border);
+            text-align: center;
+            font-size: 1.1rem;
+            letter-spacing: 0.1em;
+            transition: all 0.3s;
+            width: 300px;
+        }
+
+        .mission-input:focus {
+            outline: none;
+            border-bottom-color: var(--accent-cyan);
+            text-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="glass-panel w-[90vw] max-w-4xl h-[600px] flex flex-col items-center justify-center p-12 space-y-12">
+        
+        <!-- Header -->
+        <div class="absolute top-8 left-12 flex items-center space-y-1">
+            <div class="w-2 h-2 bg-[#00f2ff] rounded-full animate-pulse mr-3"></div>
+            <h1 class="text-xs uppercase tracking-[0.4em] font-light text-gray-400">System.Neo-Chronos</h1>
+        </div>
+
+        <!-- Mission Input -->
+        <div class="flex flex-col items-center space-y-4">
+            <label class="text-[10px] uppercase tracking-[0.3em] text-gray-500">Misión Actual</label>
+            <input type="text" placeholder="¿EN QUÉ ESTAMOS TRABAJANDO?" class="mission-input py-2 text-white font-light" id="missionInput">
+        </div>
+
+        <!-- The Capturer -->
+        <div class="relative group">
+            <div class="neo-button" id="mainTrigger">
+                <span id="btnText" class="text-xs font-semibold tracking-widest text-[#00f2ff]">INICIAR ENFOQUE</span>
+                <div id="chronoDisplay" class="hidden flex flex-col items-center">
+                    <span id="mainChrono" class="timer-font text-3xl font-bold">00:00:00</span>
+                    <span id="milliChrono" class="timer-font text-sm text-[#00f2ff] opacity-80">.00</span>
+                </div>
+            </div>
+            <!-- Decorative ring -->
+            <div class="absolute inset-[-10px] border border-white/5 rounded-full pointer-events-none group-hover:border-[#00f2ff]/20 transition-all duration-700"></div>
+        </div>
+
+        <!-- Stats -->
+        <div class="flex space-x-24 text-center">
+            <div class="flex flex-col">
+                <span class="text-[10px] text-gray-500 uppercase tracking-widest">Enfoque Total</span>
+                <span class="timer-font text-xl text-white">04:22<span class="text-xs text-gray-500">h</span></span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-[10px] text-gray-500 uppercase tracking-widest">Sesiones</span>
+                <span class="timer-font text-xl text-white">12</span>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline-container">
+            <span class="text-[9px] text-gray-600 mr-4 font-mono">00:00</span>
+            <div class="timeline-bar">
+                <!-- Recorded blocks examples -->
+                <div class="time-block" style="left: 10%; width: 5%;"></div>
+                <div class="time-block" style="left: 30%; width: 12%;"></div>
+                <div class="time-block" style="left: 55%; width: 8%;"></div>
+                <!-- Current indicator -->
+                <div id="currentTimeIndicator" class="absolute h-8 w-[1px] bg-white/40 top-[-14px]" style="left: 65%;">
+                    <span class="absolute top-[-15px] left-[-15px] text-[8px] font-mono whitespace-nowrap">AHORA</span>
+                </div>
+            </div>
+            <span class="text-[9px] text-gray-600 ml-4 font-mono">24:00</span>
+        </div>
+    </div>
+
+    <script>
+        let startTime;
+        let timerInterval;
+        let isRunning = false;
+
+        const mainTrigger = document.getElementById('mainTrigger');
+        const btnText = document.getElementById('btnText');
+        const chronoDisplay = document.getElementById('chronoDisplay');
+        const mainChrono = document.getElementById('mainChrono');
+        const milliChrono = document.getElementById('milliChrono');
+
+        mainTrigger.addEventListener('click', () => {
+            if (!isRunning) {
+                startTimer();
+            } else {
+                stopTimer();
+            }
+        });
+
+        function startTimer() {
+            isRunning = true;
+            startTime = Date.now();
+            mainTrigger.classList.add('active');
+            btnText.classList.add('hidden');
+            chronoDisplay.classList.remove('hidden');
+            
+            timerInterval = setInterval(updateChrono, 10);
+        }
+
+        function stopTimer() {
+            isRunning = false;
+            clearInterval(timerInterval);
+            mainTrigger.classList.remove('active');
+            btnText.classList.remove('hidden');
+            btnText.innerText = "REANUDAR";
+            chronoDisplay.classList.add('hidden');
+            
+            // Here we would normally save the session
+            console.log("Sesión terminada");
+        }
+
+        function updateChrono() {
+            const now = Date.now();
+            const diff = now - startTime;
+
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            const ms = Math.floor((diff % 1000) / 10);
+
+            mainChrono.innerText = 
+                `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            milliChrono.innerText = `.${ms.toString().padStart(2, '0')}`;
+        }
+
+        // Simple real-time timeline position
+        function updateTimelineCursor() {
+            const now = new Date();
+            const totalMinutes = now.getHours() * 60 + now.getMinutes();
+            const percentage = (totalMinutes / 1440) * 100;
+            document.getElementById('currentTimeIndicator').style.left = percentage + '%';
+        }
+
+        setInterval(updateTimelineCursor, 60000);
+        updateTimelineCursor();
+    </script>
+</body>
+</html>

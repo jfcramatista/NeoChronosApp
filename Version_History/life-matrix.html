@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Matrix | Macro Cosmos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'cosmic-bg': 'var(--bg-color)',
+                        'cosmic-accent': 'var(--accent-color)',
+                        'void': 'var(--void-color)',
+                        'matter': 'var(--matter-color)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --accent-color: #00f2ff;
+            --matter-color: #00f2ff;
+            --void-color: #1a1a1a;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --text-main: #e0e0e0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Matrix Grid */
+        .life-grid {
+            display: grid;
+            grid-template-columns: repeat(52, 1fr);
+            gap: 2px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .week-node {
+            aspect-ratio: 1;
+            background-color: var(--void-color);
+            border-radius: 1px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .week-node.lived {
+            background-color: var(--matter-color);
+            box-shadow: 0 0 2px var(--matter-color);
+            opacity: 0.8;
+        }
+
+        .week-node:hover {
+            transform: scale(1.5);
+            z-index: 10;
+            background-color: white !important;
+            box-shadow: 0 0 10px white;
+        }
+
+        .week-node.has-memory::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 4px;
+            background-color: #ff0055;
+            border-radius: 50%;
+        }
+
+        /* Config Panel */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: fixed;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 0.1s;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+        }
+
+        .timer-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col items-center py-12 px-4">
+
+    <!-- Header / Config -->
+    <header class="w-full max-w-6xl flex justify-between items-end mb-8">
+        <div>
+            <h1 class="text-xs uppercase tracking-[0.6em] font-light opacity-60 mb-2">Life Matrix</h1>
+            <div class="flex items-center space-x-4">
+                <input type="date" id="birthdateInput" onchange="updateMatrix()"
+                    class="bg-transparent border-b border-white/20 text-sm font-mono focus:outline-none focus:border-cyan-500 text-white/80">
+                <span class="text-[10px] uppercase tracking-widest opacity-40">Origen Temporal</span>
+            </div>
+        </div>
+
+        <a href="neo-chronos-cosmic.html"
+            class="text-[10px] uppercase tracking-widest opacity-40 hover:opacity-100 hover:text-cyan-400 transition-all flex items-center gap-2">
+            <span>&larr; Retornar al Micro Cosmos</span>
+        </a>
+    </header>
+
+    <!-- Stats -->
+    <div class="w-full max-w-6xl grid grid-cols-4 gap-4 mb-4">
+        <div class="glass-panel p-4 flex flex-col items-center">
+            <span class="text-[9px] uppercase tracking-widest opacity-40">Semanas Vividas</span>
+            <span id="livedCount" class="text-2xl font-bold font-mono mt-1 text-cyan-400">0</span>
+        </div>
+        <div class="glass-panel p-4 flex flex-col items-center">
+            <span class="text-[9px] uppercase tracking-widest opacity-40">Porcentaje (90 años)</span>
+            <span id="livedPercent" class="text-2xl font-bold font-mono mt-1">0%</span>
+        </div>
+        <div class="glass-panel p-4 flex flex-col items-center">
+            <span class="text-[9px] uppercase tracking-widest opacity-40">Restantes (Est.)</span>
+            <span id="leftCount" class="text-2xl font-bold font-mono mt-1 opacity-50">4680</span>
+        </div>
+        <div class="glass-panel p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors"
+            onclick="resetData()">
+            <span class="text-[9px] uppercase tracking-widest text-red-400">Reiniciar Sistema</span>
+        </div>
+    </div>
+
+    <!-- The Grid -->
+    <div id="gridContainer" class="life-grid mb-12">
+        <!-- Generated by JS -->
+    </div>
+
+    <!-- Memory Modal -->
+    <div id="memoryModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="glass-panel w-[400px] p-8 flex flex-col relative">
+            <button onclick="closeModal()"
+                class="absolute top-4 right-4 text-white/40 hover:text-white">&times;</button>
+            <h3 class="text-xs uppercase tracking-widest mb-4 text-cyan-400" id="modalDateDisplay">Semana X</h3>
+            <textarea id="memoryInput" rows="5"
+                class="w-full bg-black/30 border border-white/10 rounded p-4 text-sm text-white focus:outline-none focus:border-cyan-500 mb-4"
+                placeholder="Registrar evento en la memoria del sistema..."></textarea>
+            <div class="flex justify-end gap-2">
+                <button onclick="saveMemory()"
+                    class="bg-cyan-900/50 hover:bg-cyan-500/50 border border-cyan-500/30 text-cyan-300 text-xs px-4 py-2 rounded uppercase tracking-widest transition-all">
+                    Archivar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hover Tooltip -->
+    <div id="tooltip" class="tooltip glass-panel px-3 py-2 text-white border-white/20"></div>
+
+    <script>
+        const TOTAL_YEARS = 90;
+        const WEEKS_PER_YEAR = 52;
+        const TOTAL_WEEKS = TOTAL_YEARS * WEEKS_PER_YEAR;
+        let selectedWeekIndex = null;
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedDate = localStorage.getItem('life-matrix-birthdate');
+            if (savedDate) {
+                document.getElementById('birthdateInput').value = savedDate;
+                renderMatrix(new Date(savedDate));
+            } else {
+                // Default visualization (empty or example)
+                // renderMatrix(new Date()); 
+                // Let's ask user to input
+            }
+        });
+
+        function updateMatrix() {
+            const dateStr = document.getElementById('birthdateInput').value;
+            if (!dateStr) return;
+
+            localStorage.setItem('life-matrix-birthdate', dateStr);
+            renderMatrix(new Date(dateStr));
+        }
+
+        function renderMatrix(birthDate) {
+            const container = document.getElementById('gridContainer');
+            container.innerHTML = '';
+
+            const today = new Date();
+            // Calculate weeks lived
+            const diffTime = Math.abs(today - birthDate);
+            const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+
+            // Stats
+            document.getElementById('livedCount').innerText = diffWeeks;
+            document.getElementById('leftCount').innerText = TOTAL_WEEKS - diffWeeks;
+            document.getElementById('livedPercent').innerText = ((diffWeeks / TOTAL_WEEKS) * 100).toFixed(1) + '%';
+
+            const memories = JSON.parse(localStorage.getItem('life-matrix-memories') || '{}');
+
+            const fragment = document.createDocumentFragment();
+
+            for (let i = 0; i < TOTAL_WEEKS; i++) {
+                const node = document.createElement('div');
+                node.className = 'week-node';
+
+                // State: Lived vs Future
+                if (i < diffWeeks) {
+                    node.classList.add('lived');
+                    // Opacity gradient based on age (fresher memories are brighter?) 
+                    // or standard eras. Let's keep it simple cyber-blue for now.
+                }
+
+                if (memories[i]) {
+                    node.classList.add('has-memory');
+                }
+
+                // Interactive Data
+                // Calculate date for this week
+                const weekDate = new Date(birthDate.getTime() + (i * 7 * 24 * 60 * 60 * 1000));
+                node.dataset.date = weekDate.toLocaleDateString();
+                node.dataset.age = Math.floor(i / 52);
+                node.dataset.index = i;
+
+                // Events
+                node.addEventListener('mouseenter', (e) => showTooltip(e, node, memories[i]));
+                node.addEventListener('mouseleave', hideTooltip);
+                node.addEventListener('click', () => openModal(i, weekDate, memories[i]));
+
+                fragment.appendChild(node);
+            }
+
+            container.appendChild(fragment);
+        }
+
+        function showTooltip(e, node, memory) {
+            const tooltip = document.getElementById('tooltip');
+            const age = node.dataset.age;
+            const date = node.dataset.date;
+
+            let content = `Age: ${age} | ${date}`;
+            if (memory) {
+                content += `<br><span class="text-cyan-400">Note: ${memory.substring(0, 20)}...</span>`;
+            }
+
+            tooltip.innerHTML = content;
+            tooltip.style.opacity = 1;
+            moveTooltip(e);
+        }
+
+        function moveTooltip(e) {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.style.top = (e.clientY - 40) + 'px';
+            tooltip.style.left = (e.clientX + 10) + 'px';
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').style.opacity = 0;
+        }
+
+        // Modal Logic
+        function openModal(index, date, existingMemory = '') {
+            selectedWeekIndex = index;
+            document.getElementById('modalDateDisplay').innerText = `SEMANA ${index} \n ${date.toLocaleDateString()}`;
+            document.getElementById('memoryInput').value = existingMemory || '';
+            document.getElementById('memoryModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('memoryModal').style.display = 'none';
+        }
+
+        function saveMemory() {
+            if (selectedWeekIndex === null) return;
+
+            const text = document.getElementById('memoryInput').value;
+            const memories = JSON.parse(localStorage.getItem('life-matrix-memories') || '{}');
+
+            if (text.trim() === '') {
+                delete memories[selectedWeekIndex];
+            } else {
+                memories[selectedWeekIndex] = text;
+            }
+
+            localStorage.setItem('life-matrix-memories', JSON.stringify(memories));
+
+            // Refund system
+            closeModal();
+            updateMatrix(); // Re-render to show dot
+        }
+
+        function resetData() {
+            if (confirm('¿Reiniciar toda la simulación? (Borrará fecha y memorias)')) {
+                localStorage.removeItem('life-matrix-birthdate');
+                localStorage.removeItem('life-matrix-memories');
+                location.reload();
+            }
+        }
+
+        // Close modal on outside click
+        window.onclick = function (event) {
+            const modal = document.getElementById('memoryModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+
+</html>

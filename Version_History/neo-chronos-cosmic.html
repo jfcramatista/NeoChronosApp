@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neo-Chronos | Cosmic Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'cosmic-bg': 'var(--bg-color)',
+                        'cosmic-accent': 'var(--accent-color)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --accent-color: #00f2ff;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glow: rgba(0, 242, 255, 0.4);
+            --text-main: #e0e0e0;
+        }
+
+        .light {
+            --bg-color: #f5f5f7;
+            --accent-color: #0066ff;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --glow: rgba(0, 102, 255, 0.2);
+            --text-main: #1d1d1f;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            transition: background-color 0.5s ease;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Cosmic Engine */
+        .galaxy-vortex {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .spiral-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--accent-color);
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            opacity: 0.2;
+            animation: rotate-spiral 10s linear infinite;
+        }
+
+        .spiral-layer:nth-child(2) {
+            width: 80%;
+            height: 80%;
+            animation-duration: 7s;
+            animation-direction: reverse;
+            opacity: 0.15;
+            border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%;
+        }
+
+        .spiral-layer:nth-child(3) {
+            width: 60%;
+            height: 60%;
+            animation-duration: 5s;
+            opacity: 0.1;
+        }
+
+        @keyframes rotate-spiral {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Supernova Effect */
+        .supernova-burst {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            filter: blur(2px);
+            box-shadow: 0 0 50px 20px white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .exploding .supernova-burst {
+            animation: burst 0.8s ease-out forwards;
+        }
+
+        @keyframes burst {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+                filter: blur(2px);
+            }
+
+            50% {
+                transform: scale(30);
+                opacity: 0.8;
+                filter: blur(10px);
+            }
+
+            100% {
+                transform: scale(60);
+                opacity: 0;
+                filter: blur(30px);
+            }
+        }
+
+        /* Wormhole State */
+        .wormhole {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #000 30%, var(--accent-color) 70%, transparent 100%);
+            box-shadow: 0 0 40px var(--glow);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(0);
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 20;
+        }
+
+        .active .wormhole {
+            transform: scale(1);
+        }
+
+        .active .galaxy-vortex {
+            opacity: 0.3;
+            transform: scale(1.5) rotate(90deg);
+        }
+
+        /* Focus Energy Growth */
+        .focus-energy {
+            position: absolute;
+            width: 110%;
+            height: 110%;
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: pulse-energy 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-energy {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.6;
+            }
+        }
+
+        .timer-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center">
+
+    <!-- Theme Switcher -->
+    <button onclick="toggleTheme()" class="theme-toggle flex items-center space-x-2">
+        <span id="themeIcon" class="text-lg">🌙</span>
+        <span class="text-[10px] uppercase tracking-widest font-semibold opacity-60" id="themeText">Deep Space</span>
+    </button>
+
+    <a href="life-matrix.html"
+        class="absolute top-2 left-2 p-2 opacity-30 hover:opacity-100 transition-opacity flex items-center gap-2 group">
+        <div class="w-4 h-4 grid grid-cols-2 gap-[1px]">
+            <div class="bg-cyan-400"></div>
+            <div class="bg-white/20"></div>
+            <div class="bg-cyan-400"></div>
+            <div class="bg-cyan-400"></div>
+        </div>
+        <span class="text-[8px] uppercase tracking-widest hidden group-hover:block text-cyan-400">Life Matrix</span>
+    </a>
+
+    <div
+        class="glass-panel w-[92vw] max-w-5xl h-[700px] flex flex-col items-center justify-between p-12 relative overflow-hidden">
+
+        <!-- Decoration -->
+        <div class="absolute top-8 left-12 flex flex-col">
+            <h1 class="text-xs uppercase tracking-[0.6em] font-light opacity-40">Neo-Chronos</h1>
+            <span class="text-[8px] tracking-[0.4em] opacity-30 mt-1">v.2.0 COSMIC EDITION</span>
+        </div>
+
+        <div class="supernova-burst" id="supernova"></div>
+
+        <!-- Upper Section: Mission -->
+        <div class="w-full flex flex-col items-center mt-8">
+            <input type="text" id="missionInput" placeholder="IDENTIFICA TU MISIÓN..."
+                class="bg-transparent border-b border-white/10 dark:border-white/5 py-4 w-1/2 text-center text-xl font-light tracking-widest focus:outline-none focus:border-cyan-500 transition-all placeholder:opacity-20">
+        </div>
+
+        <!-- Middle Section: The Catalyst -->
+        <div class="relative flex items-center justify-center flex-1" id="engineContainer">
+
+            <!-- Idle State: Galaxy -->
+            <div class="galaxy-vortex" id="galaxy">
+                <div class="spiral-layer"></div>
+                <div class="spiral-layer"></div>
+                <div class="spiral-layer"></div>
+                <button onclick="ignite()" id="igniteBtn"
+                    class="z-30 text-[10px] tracking-[0.4em] font-bold text-cyan-400 hover:text-white transition-colors">
+                    CAPTURA EL TIEMPO
+                </button>
+            </div>
+
+            <!-- Active State: Wormhole -->
+            <div class="wormhole absolute" id="wormhole" onclick="stabilize()">
+                <div class="focus-energy" id="energyRing"></div>
+                <div class="flex flex-col items-center z-40">
+                    <span id="mainChrono" class="timer-font text-2xl font-bold text-white">00:00</span>
+                    <span id="milliChrono" class="timer-font text-[10px] text-cyan-400 mt-1">.00</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Section: Universe Stats & Timeline -->
+        <div class="w-full space-y-8">
+            <div class="flex justify-around items-end">
+                <div class="text-center group cursor-help">
+                    <div
+                        class="text-[9px] uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity">
+                        Densidad Temporal</div>
+                    <div class="timer-font text-lg mt-1" id="densityMetric">0.00%</div>
+                </div>
+                <div class="text-center group cursor-help">
+                    <div
+                        class="text-[9px] uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity">
+                        Masa de Enfoque</div>
+                    <div class="timer-font text-lg mt-1">1.2 <span class="text-xs opacity-40">sol</span></div>
+                </div>
+                <div class="text-center group cursor-help">
+                    <div
+                        class="text-[9px] uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity">
+                        Expansión</div>
+                    <div class="timer-font text-lg mt-1" id="expansionMetric">1.0x</div>
+                </div>
+            </div>
+
+            <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-white/10 to-transparent relative">
+                <div class="absolute top-[-3px] left-1/4 w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_10px_#00f2ff]">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isDark = true;
+        let isActive = false;
+        let startTime;
+        let timerInterval;
+
+        function toggleTheme() {
+            isDark = !isDark;
+            document.documentElement.classList.toggle('dark');
+            document.documentElement.classList.toggle('light');
+            document.getElementById('themeIcon').innerText = isDark ? '🌙' : '☀️';
+            document.getElementById('themeText').innerText = isDark ? 'Deep Space' : 'Supernova';
+        }
+
+        function ignite() {
+            const container = document.getElementById('engineContainer');
+            const supernova = document.getElementById('supernova');
+
+            // Trigger Supernova
+            container.classList.add('exploding');
+
+            setTimeout(() => {
+                isActive = true;
+                container.classList.remove('exploding');
+                container.classList.add('active');
+                startTimer();
+            }, 400);
+        }
+
+        function stabilize() {
+            isActive = false;
+            document.getElementById('engineContainer').classList.remove('active');
+            stopTimer();
+        }
+
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateUI, 10);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            // Return growth to 1
+            document.getElementById('wormhole').style.transform = 'scale(1)';
+            document.getElementById('expansionMetric').innerText = '1.0x';
+        }
+
+        function updateUI() {
+            const diff = Date.now() - startTime;
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            const ms = Math.floor((diff % 1000) / 10);
+
+            document.getElementById('mainChrono').innerText =
+                `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            document.getElementById('milliChrono').innerText = `.${ms.toString().padStart(2, '0')}`;
+
+            // Wormhole Expansion Logic (grows slightly over time)
+            // Starts at scale 1, grows 0.1 every 10 seconds of focus
+            const growth = 1 + (diff / 100000);
+            document.getElementById('wormhole').style.transform = `scale(${Math.min(growth, 2)})`;
+            document.getElementById('expansionMetric').innerText = growth.toFixed(2) + 'x';
+
+            // Density Metric animation simulating complexity
+            document.getElementById('densityMetric').innerText = (diff / 50000).toFixed(2) + '%';
+        }
+    </script>
+</body>
+
+</html>
