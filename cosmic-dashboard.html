@@ -105,6 +105,33 @@
         .animate-fade-in {
             animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
+
+        @keyframes pulseGlow {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 5px #fff;
+                background-color: #00f2ff;
+            }
+
+            50% {
+                transform: scale(1.15);
+                box-shadow: 0 0 20px #fff, 0 0 30px #00f2ff;
+                background-color: #fff;
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 5px #fff;
+                background-color: #00f2ff;
+            }
+        }
+
+        .current-pulse {
+            animation: pulseGlow 2s ease-in-out infinite !important;
+            z-index: 20;
+            position: relative;
+            border: 1px solid white !important;
+        }
     </style>
 </head>
 

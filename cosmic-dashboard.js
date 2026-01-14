@@ -104,8 +104,17 @@ function renderLifeGrid(mode) {
     const frag = document.createDocumentFragment();
     for (let i = 0; i < total; i++) {
         const d = document.createElement('div');
-        d.className = 'aspect-square rounded-[1px] transition-all duration-300 ' +
-            (i < lived ? 'bg-cyan-500 opacity-60 hover:opacity-100 hover:bg-cyan-400' : 'bg-white/5 border border-white/5 hover:border-white/20');
+        let statusClass = '';
+
+        if (i < lived) {
+            statusClass = 'bg-cyan-500 opacity-60 hover:opacity-100 hover:bg-cyan-400';
+        } else if (i === lived) {
+            statusClass = 'current-pulse'; // THE PRESENT MOMENT
+        } else {
+            statusClass = 'bg-white/5 border border-white/5 hover:border-white/20';
+        }
+
+        d.className = `aspect-square rounded-[1px] transition-all duration-300 ${statusClass}`;
         frag.appendChild(d);
     }
     grid.appendChild(frag);
