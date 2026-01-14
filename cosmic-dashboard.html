@@ -130,7 +130,12 @@
             animation: pulseGlow 2s ease-in-out infinite !important;
             z-index: 20;
             position: relative;
-            border: 1px solid white !important;
+            background-color: #00f2ff !important;
+            filter: drop-shadow(0 0 10px #00f2ff);
+        }
+
+        .hex-shape {
+            clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
         }
     </style>
 </head>
@@ -178,15 +183,22 @@
                     <h2 class="text-2xl font-light tracking-[0.3em] text-cyan-400 mb-2 uppercase">Calibración de Origen
                     </h2>
                     <p class="text-[10px] text-white/40 font-mono text-center mb-8 tracking-widest leading-relaxed">
-                        Para trazar tu densidad temporal en la Matrix, requerimos tu punto de inicio en este plano
-                        existencial.
+                        Para trazar tu densidad temporal en la Matrix, requerimos tu punto de inicio y tu proyección de
+                        vida.
                     </p>
 
-                    <div class="w-full space-y-6">
+                    <div class="w-full space-y-4">
                         <div class="flex flex-col space-y-2">
                             <label class="text-[9px] uppercase tracking-[0.2em] text-cyan-400/60 font-bold ml-1">Fecha
                                 de Nacimiento</label>
                             <input type="date" id="life-birth-input"
+                                class="w-full bg-black/40 border-b border-white/10 p-3 text-white focus:outline-none focus:border-cyan-500 font-mono transition-all text-sm">
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label
+                                class="text-[9px] uppercase tracking-[0.2em] text-cyan-400/60 font-bold ml-1">Expectativa
+                                de Vida (Años)</label>
+                            <input type="number" id="life-expectancy-input" value="90"
                                 class="w-full bg-black/40 border-b border-white/10 p-3 text-white focus:outline-none focus:border-cyan-500 font-mono transition-all text-sm">
                         </div>
                         <button onclick="saveLifeCalibration()"
@@ -248,8 +260,20 @@
             <section id="tab-settings" class="tab-content flex-col items-center justify-center w-full h-full p-12">
                 <div class="glass p-12 rounded-3xl max-w-md w-full border border-cyan-500/20 relative">
                     <h2 class="text-xl font-light tracking-widest text-center mb-8">Origen Temporal</h2>
-                    <input type="date" id="setup-date"
-                        class="w-full bg-black/50 border border-white/10 rounded p-3 text-white mb-6">
+                    <div class="space-y-4 mb-6">
+                        <div class="flex flex-col space-y-1">
+                            <label class="text-[8px] uppercase tracking-widest text-white/40 ml-1">Fecha de
+                                Origen</label>
+                            <input type="date" id="setup-date"
+                                class="w-full bg-black/50 border border-white/10 rounded p-3 text-white">
+                        </div>
+                        <div class="flex flex-col space-y-1">
+                            <label class="text-[8px] uppercase tracking-widest text-white/40 ml-1">Expectativa Vital
+                                (Años)</label>
+                            <input type="number" id="setup-expectancy" value="90"
+                                class="w-full bg-black/50 border border-white/10 rounded p-3 text-white">
+                        </div>
+                    </div>
                     <button onclick="saveSettings()"
                         class="w-full bg-cyan-900/30 hover:bg-cyan-500 border border-cyan-500/50 text-cyan-400 py-3 rounded text-xs uppercase tracking-widest transition-all">Sincronizar</button>
                     <button onclick="resetSystem()"

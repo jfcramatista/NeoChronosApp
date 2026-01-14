@@ -1,9 +1,12 @@
 const LS_KEY_BIRTH = 'neo-chronos-birthdate';
-const TOTAL_YEARS = 90;
+const LS_KEY_EXPECTANCY = 'neo-chronos-expectancy';
+let totalYears = parseInt(localStorage.getItem(LS_KEY_EXPECTANCY)) || 90;
 let timerInterval, timerStartTime, isTimerRunning = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     const birth = localStorage.getItem(LS_KEY_BIRTH);
+    const expectancy = localStorage.getItem(LS_KEY_EXPECTANCY);
+
     if (!birth) {
         const overlay = document.getElementById('onboarding-overlay');
         if (overlay) {
@@ -13,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         // Direct entry
         document.getElementById('setup-date').value = birth;
+        document.getElementById('setup-expectancy').value = totalYears;
         switchTab('life');
     }
 });
@@ -65,14 +69,14 @@ function renderLifeGrid(mode) {
     let total, lived, cols, gap, label;
 
     if (mode === 'years') {
-        total = TOTAL_YEARS;
+        total = totalYears;
         lived = today.getFullYear() - birth.getFullYear();
-        cols = 10;
-        gap = '8px';
+        cols = (totalYears <= 50) ? 10 : (totalYears <= 100 ? 10 : 20);
+        gap = '10px';
         label = 'Años Vividos';
     }
     else if (mode === 'months') {
-        total = TOTAL_YEARS * 12;
+        total = totalYears * 12;
         lived = (today.getFullYear() - birth.getFullYear()) * 12 + (today.getMonth() - birth.getMonth());
         cols = 36;
         gap = '4px';
@@ -80,7 +84,7 @@ function renderLifeGrid(mode) {
     }
     else {
         // weeks
-        total = TOTAL_YEARS * 52;
+        total = totalYears * 52;
         lived = Math.floor((today - birth) / (604800000));
         cols = 52;
         gap = '2px';
@@ -96,10 +100,10 @@ function renderLifeGrid(mode) {
     document.getElementById('stat-percent').innerText = ((lived / total) * 100).toFixed(1) + '%';
 
     // Restoring to full-width as requested
-    grid.className = 'grid w-full animate-fade-in';
-    grid.style.maxWidth = 'none';
+    grid.className = 'grid w-full animate-fade-in mx-auto';
+    grid.style.maxWidth = (mode === 'years') ? '800px' : 'none';
     grid.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
-    grid.style.gap = (mode === 'years') ? '10px' : (mode === 'months' ? '4px' : '2px');
+    grid.style.gap = gap;
 
     const frag = document.createDocumentFragment();
     for (let i = 0; i < total; i++) {
@@ -114,7 +118,7 @@ function renderLifeGrid(mode) {
             statusClass = 'bg-white/5 border border-white/5 hover:border-white/20';
         }
 
-        d.className = `aspect-square rounded-[1px] transition-all duration-300 ${statusClass}`;
+        d.className = `aspect-square transition-all duration-300 hex-shape ${statusClass}`;
         frag.appendChild(d);
     }
     grid.appendChild(frag);
@@ -126,14 +130,22 @@ function renderLifeGrid(mode) {
 }
 
 function saveLifeCalibration() {
-    const val = document.getElementById('life-birth-input').value;
-    if (val) {
-        localStorage.setItem(LS_KEY_BIRTH, val);
+    const valBirth = document.getElementById('life-birth-input').value;
+    const valExpectancy = document.getElementById('life-expectancy-input').value;
+
+    if (valBirth && valExpectancy) {
+        localStorage.setItem(LS_KEY_BIRTH, valBirth);
+        localStorage.setItem(LS_KEY_EXPECTANCY, valExpectancy);
+        totalYears = parseInt(valExpectancy);
+
         const dInput = document.getElementById('setup-date');
-        if (dInput) dInput.value = val;
+        if (dInput) dInput.value = valBirth;
+        const eInput = document.getElementById('setup-expectancy');
+        if (eInput) eInput.value = valExpectancy;
+
         switchTab('life');
     } else {
-        alert("Sajor, la Matrix requiere un origen válido para trazar tu existencia.");
+        alert("Sajor, la Matrix requiere datos válidos para calcular tu proyección.");
     }
 }
 
@@ -155,11 +167,13 @@ function toggleTimer() {
 }
 
 function saveSettings() {
-    const val = document.getElementById('setup-date').value;
-    if (val) {
-        localStorage.setItem(LS_KEY_BIRTH, val);
-        const overlay = document.getElementById('onboarding-overlay');
-        if (overlay) overlay.style.display = 'none';
+    const valBirth = document.getElementById('setup-date').value;
+    const valExpectancy = document.getElementById('setup-expectancy').value;
+
+    if (valBirth && valExpectancy) {
+        localStorage.setItem(LS_KEY_BIRTH, valBirth);
+        localStorage.setItem(LS_KEY_EXPECTANCY, valExpectancy);
+        totalYears = parseInt(valExpectancy);
         switchTab('life');
     }
 }
@@ -167,6 +181,7 @@ function saveSettings() {
 function resetSystem() {
     if (confirm('¿Reiniciar sistema? Perderás tu origen y memorias.')) {
         localStorage.removeItem(LS_KEY_BIRTH);
+        localStorage.removeItem(LS_KEY_EXPECTANCY);
         location.reload();
     }
 }
