@@ -431,6 +431,84 @@
             transform: scale(1.2);
         }
 
+        /* ACTIVE FOCUS EFFECTS */
+        @keyframes matrixRain {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 0 100%;
+            }
+        }
+
+        .matrix-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)),
+                repeating-linear-gradient(0deg,
+                    rgba(0, 242, 255, 0) 0px,
+                    rgba(0, 242, 255, 0) 2px,
+                    rgba(0, 242, 255, 0.08) 3px,
+                    rgba(0, 242, 255, 0) 4px);
+            background-size: 100% 100%, 100% 20px;
+            animation: matrixRain 10s linear infinite;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1s;
+            z-index: 1;
+        }
+
+        .session-active .matrix-bg {
+            opacity: 1;
+        }
+
+        @keyframes pillarPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px var(--pulse-pilar);
+                filter: brightness(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 50px var(--pulse-pilar), inset 0 0 20px var(--pulse-pilar);
+                filter: brightness(1.8);
+            }
+        }
+
+        .hour-progress-hex.active-pulse {
+            animation: pillarPulse 2s infinite ease-in-out !important;
+        }
+
+        @keyframes btnScan {
+            0% {
+                top: -100%;
+            }
+
+            100% {
+                top: 100%;
+            }
+        }
+
+        .btn-scan-line {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.4), transparent);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            animation: btnScan 3s linear infinite;
+            pointer-events: none;
+            display: none;
+        }
+
+        #session-main-btn.scanning .btn-scan-line {
+            display: block;
+        }
+
         .hour-progress-sublabel {
             position: relative;
             z-index: 10;
@@ -639,8 +717,9 @@
                         </div>
 
                         <!-- Actions & Focal Point -->
-                        <div
+                        <div id="session-panel"
                             class="glass p-10 rounded-[2rem] border-cyan-500/10 flex flex-col space-y-8 animate-fade-in relative overflow-hidden">
+                            <div id="matrix-rain" class="matrix-bg"></div>
                             <div class="absolute top-0 right-0 p-4 opacity-10">
                                 <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -648,9 +727,10 @@
                             </div>
 
                             <!-- INPUT AREA -->
-                            <div id="session-input-area" class="space-y-6">
+                            <div id="session-input-area" class="space-y-6 relative z-10">
                                 <h3 id="session-title"
-                                    class="text-xs uppercase tracking-[0.3em] text-cyan-400 font-bold">Protocolo de
+                                    class="text-xs uppercase tracking-[0.3em] text-cyan-400 font-bold">
+                                    Protocolo de
                                     Acción</h3>
 
                                 <div class="space-y-2">
@@ -715,6 +795,7 @@
                             <!-- DYNAMIC BUTTON -->
                             <button id="session-main-btn" onclick="handleSessionTrigger()"
                                 class="group relative w-full py-5 bg-cyan-500 text-black text-[11px] uppercase font-black tracking-[0.5em] rounded-xl overflow-hidden hover:scale-[1.02] transition-all">
+                                <div class="btn-scan-line"></div>
                                 <span id="session-btn-text" class="relative z-10">INICIAR SECUENCIA</span>
                                 <div
                                     class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity">
@@ -723,7 +804,7 @@
 
                             <!-- HOVER INFO DISPLAY (Bitácora) -->
                             <div id="bitacora-display"
-                                class="mt-4 pt-6 border-t border-white/5 opacity-0 transition-opacity duration-300">
+                                class="mt-4 pt-6 border-t border-white/5 opacity-0 transition-opacity duration-300 relative z-10">
                                 <h4 class="text-[9px] uppercase tracking-[0.3em] text-cyan-400/60 mb-3 font-bold">
                                     Bitácora de la Hora</h4>
                                 <div class="bg-white/5 p-4 rounded-xl space-y-2">

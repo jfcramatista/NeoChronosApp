@@ -9,6 +9,12 @@ let isSessionActive = false;
 let sessionStartTime = null;
 let selectedAnomalyDate = null;
 const ENERGY_ICONS = { bolt: '⚡', diamond: '💠', aura: '🟣' };
+const PILLAR_COLORS = {
+    'pillar-op': '#00f2ff',
+    'pillar-con': '#ff007a',
+    'pillar-vit': '#39ff14',
+    'pillar-chaos': '#f0f000'
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     const birth = localStorage.getItem(LS_KEY_BIRTH);
@@ -265,6 +271,14 @@ function selectPillar(id, btn) {
     selectedPillarCode = id;
     document.querySelectorAll('.pillar-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+
+    // Real-time pulse update if session is active
+    if (isSessionActive) {
+        const centralHex = document.querySelector('.hour-progress-hex');
+        if (centralHex) {
+            centralHex.style.setProperty('--pulse-pilar', PILLAR_COLORS[selectedPillarCode]);
+        }
+    }
 }
 
 function selectEnergy(type, btn) {
@@ -280,6 +294,9 @@ function handleSessionTrigger() {
     const statusText = document.getElementById('session-status-text');
     const timerDisplay = document.getElementById('session-timer-display');
 
+    const panel = document.getElementById('session-panel');
+    const centralHex = document.querySelector('.hour-progress-hex');
+
     if (!isSessionActive) {
         const task = input.value.trim();
         if (!task) { alert("Sajor, define tu foco de operación."); return; }
@@ -288,10 +305,17 @@ function handleSessionTrigger() {
         sessionStartTime = new Date();
 
         btn.classList.replace('bg-cyan-500', 'bg-red-500');
+        btn.classList.add('scanning');
         btnText.innerText = "SELLAR ACCIÓN";
         statusText.innerText = `OPERANDO EN: ${task.toUpperCase()}`;
         statusText.classList.replace('text-white/30', 'text-cyan-400');
         input.disabled = true;
+
+        if (panel) panel.classList.add('session-active');
+        if (centralHex) {
+            centralHex.classList.add('active-pulse');
+            centralHex.style.setProperty('--pulse-pilar', PILLAR_COLORS[selectedPillarCode]);
+        }
     } else {
         const task = input.value;
         const endTime = new Date();
@@ -305,6 +329,7 @@ function handleSessionTrigger() {
         sessionStartTime = null;
 
         btn.classList.replace('bg-red-500', 'bg-cyan-500');
+        btn.classList.remove('scanning');
         btnText.innerText = "INICIAR SECUENCIA";
         statusText.innerText = "Operación sellada en la Matrix.";
         statusText.classList.replace('text-cyan-400', 'text-white/30');
@@ -312,6 +337,10 @@ function handleSessionTrigger() {
         input.disabled = false;
         input.value = "";
         timerDisplay.innerText = "00:00";
+
+        if (panel) panel.classList.remove('session-active');
+        if (centralHex) centralHex.classList.remove('active-pulse');
+
         renderDayClock();
     }
 }
