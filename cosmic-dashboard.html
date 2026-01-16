@@ -51,15 +51,6 @@
                 </svg>
             </button>
 
-            <!-- Ciclo Circadiano (Día) -->
-            <button onclick="switchTab('day')" id="btn-day" title="Ciclo Circadiano"
-                class="nav-btn w-12 h-12 rounded-xl flex items-center justify-center transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-            </button>
 
             <!-- Protocolo de Acción (Rayo) -->
             <button onclick="switchTab('action')" id="btn-action" title="Protocolo de Acción"
@@ -145,138 +136,244 @@
                             class="view-btn px-6 py-2 text-[10px] uppercase tracking-widest border border-white/10 rounded-full hover:bg-white/5 transition-colors">Meses</button>
                         <button onclick="renderLifeGrid('weeks')" id="view-weeks"
                             class="view-btn px-6 py-2 text-[10px] uppercase tracking-widest border border-white/10 rounded-full hover:bg-white/5 transition-colors">Semanas</button>
+                        <button onclick="renderLifeGrid('days')" id="view-days"
+                            class="view-btn px-6 py-2 text-[10px] uppercase tracking-widest border border-white/10 rounded-full hover:bg-white/5 transition-colors">Días</button>
                     </div>
-                    <div class="grid grid-cols-3 gap-6 mb-8 w-full max-w-3xl px-6">
-                        <div class="glass p-4 rounded-xl flex flex-col items-center border-b-2 border-cyan-500/30"><span
-                                class="text-[9px] uppercase text-white/40 tracking-[0.3em] mb-1">Densidad
-                                Vital</span><span id="stat-percent" class="text-3xl font-mono font-bold"
-                                style="color: var(--accent);">0%</span></div>
-                        <div class="glass p-4 rounded-xl flex flex-col items-center"><span id="stat-label"
-                                class="text-[9px] uppercase text-white/40 tracking-[0.3em] mb-1">Cómputo
-                                Actual</span><span id="stat-lived"
-                                class="text-3xl font-mono font-bold text-white">0</span></div>
-                        <div class="glass p-4 rounded-xl flex flex-col items-center"><span
-                                class="text-[9px] uppercase text-white/40 tracking-[0.3em] mb-1">Potencial
-                                Restante</span><span id="stat-left"
-                                class="text-3xl font-mono font-bold text-white/40">0</span></div>
+
+                    <!-- Macro Views (Years, Months, Weeks) -->
+                    <div id="macro-view-container" class="w-full flex flex-col items-center">
+                        <div class="grid grid-cols-3 gap-6 mb-8 w-full max-w-3xl px-6">
+                            <div class="glass p-4 rounded-xl flex flex-col items-center border-b-2 border-cyan-500/30">
+                                <span class="text-[9px] uppercase text-white/40 tracking-[0.3em] mb-1">Densidad
+                                    Vital</span>
+                                <span id="stat-percent" class="text-3xl font-mono font-bold"
+                                    style="color: var(--accent);">0%</span>
+                            </div>
+                            <div class="glass p-4 rounded-xl flex flex-col items-center">
+                                <span id="stat-label"
+                                    class="text-[9px] uppercase text-white/40 tracking-[0.3em] mb-1">Cómputo
+                                    Actual</span>
+                                <span id="stat-lived" class="text-3xl font-mono font-bold text-white">0</span>
+                            </div>
+                            <div class="glass p-4 rounded-xl flex flex-col items-center">
+                                <span class="text-[9px] uppercase text-white/40 tracking-[0.3em] mb-1">Potencial
+                                    Restante</span>
+                                <span id="stat-left" class="text-3xl font-mono font-bold text-white/40">0</span>
+                            </div>
+                        </div>
+                        <div id="lifeGrid"
+                            class="flex flex-wrap gap-[2px] justify-start content-start w-full max-w-5xl overflow-y-auto pb-20">
+                        </div>
                     </div>
-                    <div id="lifeGrid"
-                        class="flex flex-wrap gap-[2px] justify-start content-start w-full max-w-5xl overflow-y-auto pb-20">
+
+                    <!-- Day View (Ciclo Circadiano) -->
+                    <div id="day-view-container" class="w-full flex-col items-center hidden animate-fade-in">
+                        <h2 class="text-[12px] uppercase tracking-[0.6em] theme-text-dim mb-12">Ciclo de 24 Horas</h2>
+                        <div class="flex flex-col items-center relative">
+                            <div id="dayClock" class="clock-dial">
+                                <div class="hour-progress-container">
+                                    <div class="hour-progress-hex hex-shape">
+                                        <div id="hour-progress-fill" class="hour-progress-fill" style="height: 0%;">
+                                        </div>
+                                        <span id="hour-progress-percent" class="hour-progress-label">0%</span>
+                                        <span class="hour-progress-sublabel">Día</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-8 text-[9px] theme-text-dim uppercase tracking-[0.4em]">Sincronía Biológica
+                                Temporal</p>
+                        </div>
+
+                        <!-- Bitácora Overlap (Optional UI component) -->
+                        <div id="bitacora-display"
+                            class="mt-8 glass p-6 rounded-2xl w-full max-w-md border-cyan-500/10 opacity-0 transition-opacity duration-300">
+                            <div class="flex justify-between items-center mb-4">
+                                <span id="bitacora-time" class="text-xs font-mono text-cyan-400">00:00</span>
+                                <span id="bitacora-duration"
+                                    class="text-[8px] uppercase tracking-widest text-white/40">0 min</span>
+                            </div>
+                            <h3 id="bitacora-task"
+                                class="text-sm font-light theme-text-main mb-4 italic leading-relaxed">Sin registro de
+                                comando</h3>
+                            <div class="flex gap-4">
+                                <div class="flex-1">
+                                    <span
+                                        class="text-[7px] uppercase tracking-widest text-white/20 block mb-1">Esfera</span>
+                                    <span id="bitacora-pillar" class="text-[8px] font-bold theme-text-main">---</span>
+                                </div>
+                                <div class="flex-1">
+                                    <span
+                                        class="text-[7px] uppercase tracking-widest text-white/20 block mb-1">Energía</span>
+                                    <span id="bitacora-energy" class="text-[8px] font-bold theme-text-main">---</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Frequency Mirror -->
+                        <div class="mirror-container w-full max-w-md mt-8">
+                            <h4 class="text-[9px] uppercase tracking-[0.4em] theme-text-dim mb-8 text-center italic">
+                                Espejo de Frecuencias</h4>
+                            <div class="space-y-6">
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
+                                        <span style="color: var(--color-focus)">Operación</span>
+                                        <span id="mirror-val-op" class="theme-text-main">0%</span>
+                                    </div>
+                                    <div class="frequency-bar-bg">
+                                        <div id="mirror-fill-op" class="frequency-bar-fill"
+                                            style="width:0%; background: var(--color-focus);"></div>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
+                                        <span style="color: var(--color-connection)">Conexión</span>
+                                        <span id="mirror-val-con" class="theme-text-main">0%</span>
+                                    </div>
+                                    <div class="frequency-bar-bg">
+                                        <div id="mirror-fill-con" class="frequency-bar-fill"
+                                            style="width:0%; background: var(--color-connection);"></div>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
+                                        <span style="color: var(--color-vitality)">Vitalidad</span>
+                                        <span id="mirror-val-vit" class="theme-text-main">0%</span>
+                                    </div>
+                                    <div class="frequency-bar-bg">
+                                        <div id="mirror-fill-vit" class="frequency-bar-fill"
+                                            style="width:0%; background: var(--color-vitality);"></div>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
+                                        <span style="color: var(--color-spirit)">Espíritu</span>
+                                        <span id="mirror-val-chaos" class="theme-text-main">0%</span>
+                                    </div>
+                                    <div class="frequency-bar-bg">
+                                        <div id="mirror-fill-chaos" class="frequency-bar-fill"
+                                            style="width:0%; background: var(--color-spirit);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Tab: Ciclo Circadiano (Día Hexagonal) -->
-            <section id="tab-day" class="tab-content flex-col p-8 w-full h-full items-center">
-                <div class="max-w-4xl w-full flex flex-col items-center">
-                    <h2 class="text-[12px] uppercase tracking-[0.6em] theme-text-dim mb-12">Ciclo de 24 Horas</h2>
-                    <div class="flex flex-col items-center relative">
-                        <div id="dayClock" class="clock-dial">
-                            <div class="hour-progress-container">
-                                <div class="hour-progress-hex hex-shape">
-                                    <div id="hour-progress-fill" class="hour-progress-fill" style="height: 0%;"></div>
-                                    <span id="hour-progress-percent" class="hour-progress-label">0%</span>
-                                    <span class="hour-progress-sublabel">Día</span>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="mt-8 text-[9px] theme-text-dim uppercase tracking-[0.4em]">Sincronía Biológica
-                            Temporal</p>
+
+            <!-- Protocolo de Acción (Rayo) -->
+
+            <!-- Tab: Protocolo de Acción -->
+            <section id="tab-action" class="tab-content flex-row p-6 w-full h-full items-stretch gap-6">
+                <!-- LEFT PANEL: Input Form (Compact) -->
+                <div class="w-1/3 flex flex-col space-y-4">
+                    <h3
+                        class="text-[10px] uppercase tracking-[0.4em] font-black theme-text-dim text-center pb-2 border-b border-white/10">
+                        Configuración de Misión</h3>
+
+                    <!-- Activity Input -->
+                    <div class="space-y-2">
+                        <label class="text-[8px] uppercase tracking-widest theme-text-dim font-bold">Actividad</label>
+                        <input id="current-activity-input" type="text" placeholder="¿En qué vas a trabajar?"
+                            class="w-full bg-black/40 border border-white/20 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-cyan-400 font-light transition-all">
                     </div>
-                    <!-- Frequency Mirror (Now in Day view) -->
-                    <div class="mirror-container w-full max-w-md mt-16 animate-fade-in">
-                        <h4 class="text-[9px] uppercase tracking-[0.4em] theme-text-dim mb-8 text-center italic">Espejo
-                            de Frecuencias</h4>
-                        <div class="space-y-6">
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
-                                    <span style="color: var(--color-focus)">Operación</span>
-                                    <span id="mirror-val-op" class="theme-text-main">0%</span>
-                                </div>
-                                <div class="frequency-bar-bg">
-                                    <div id="mirror-fill-op" class="frequency-bar-fill"
-                                        style="width:0%; background: var(--color-focus);"></div>
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
-                                    <span style="color: var(--color-connection)">Conexión</span>
-                                    <span id="mirror-val-con" class="theme-text-main">0%</span>
-                                </div>
-                                <div class="frequency-bar-bg">
-                                    <div id="mirror-fill-con" class="frequency-bar-fill"
-                                        style="width:0%; background: var(--color-connection);"></div>
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
-                                    <span style="color: var(--color-vitality)">Vitalidad</span>
-                                    <span id="mirror-val-vit" class="theme-text-main">0%</span>
-                                </div>
-                                <div class="frequency-bar-bg">
-                                    <div id="mirror-fill-vit" class="frequency-bar-fill"
-                                        style="width:0%; background: var(--color-vitality);"></div>
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
-                                    <span style="color: var(--color-spirit)">Espíritu</span>
-                                    <span id="mirror-val-chaos" class="theme-text-main">0%</span>
-                                </div>
-                                <div class="frequency-bar-bg">
-                                    <div id="mirror-fill-chaos" class="frequency-bar-fill"
-                                        style="width:0%; background: var(--color-spirit);"></div>
-                                </div>
-                            </div>
+
+                    <!-- Category -->
+                    <div class="space-y-2">
+                        <label class="text-[8px] uppercase tracking-widest theme-text-dim font-bold">Categoría</label>
+                        <select id="category-select"
+                            class="w-full bg-black/40 border border-white/20 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-cyan-400 transition-all cursor-pointer">
+                            <option value="">-- Sin categoría --</option>
+                            <option value="Universo Sonoro">🎵 Universo Sonoro</option>
+                            <option value="Programación">💻 Programación</option>
+                            <option value="Diseño">🎨 Diseño</option>
+                            <option value="Análisis">📊 Análisis</option>
+                            <option value="Gestión">📋 Gestión</option>
+                            <option value="Investigación">🔬 Investigación</option>
+                            <option value="Comunicación">📢 Comunicación</option>
+                        </select>
+                    </div>
+
+                    <!-- Energy State -->
+                    <div class="space-y-2">
+                        <label class="text-[8px] uppercase tracking-widest theme-text-dim font-bold">Energía</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="selectEnergy('low', this)"
+                                class="energy-btn p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all flex flex-col items-center gap-1 opacity-50">
+                                <span class="text-lg">🧊</span>
+                                <span class="text-[7px] uppercase font-bold">Baja</span>
+                            </button>
+                            <button onclick="selectEnergy('fluid', this)"
+                                class="energy-btn p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all flex flex-col items-center gap-1 opacity-50">
+                                <span class="text-lg">⚡</span>
+                                <span class="text-[7px] uppercase font-bold">Fluido</span>
+                            </button>
+                            <button onclick="selectEnergy('overload', this)"
+                                class="energy-btn p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all flex flex-col items-center gap-1 opacity-50">
+                                <span class="text-lg">🔥</span>
+                                <span class="text-[7px] uppercase font-bold">Carga</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Spheres -->
+                    <div class="space-y-2">
+                        <label class="text-[8px] uppercase tracking-widest theme-text-dim font-bold">Esfera</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="selectPillar('pillar-op', this)"
+                                class="pillar-btn p-2 rounded-lg bg-white/5 border border-white/10 flex flex-col items-center gap-1 active hover:bg-white/10 transition-all">
+                                <span class="text-lg">⚡</span>
+                                <span class="text-[7px] uppercase font-bold theme-text-dim">Op</span>
+                            </button>
+                            <button onclick="selectPillar('pillar-con', this)"
+                                class="pillar-btn p-2 rounded-lg bg-white/5 border border-white/10 flex flex-col items-center gap-1 hover:bg-white/10 transition-all">
+                                <span class="text-lg">💎</span>
+                                <span class="text-[7px] uppercase font-bold theme-text-dim">Con</span>
+                            </button>
+                            <button onclick="selectPillar('pillar-vit', this)"
+                                class="pillar-btn p-2 rounded-lg bg-white/5 border border-white/10 flex flex-col items-center gap-1 hover:bg-white/10 transition-all">
+                                <span class="text-lg">🌿</span>
+                                <span class="text-[7px] uppercase font-bold theme-text-dim">Vit</span>
+                            </button>
+                            <button onclick="selectPillar('pillar-chaos', this)"
+                                class="pillar-btn p-2 rounded-lg bg-white/5 border border-white/10 flex flex-col items-center gap-1 hover:bg-white/10 transition-all">
+                                <span class="text-lg">🌀</span>
+                                <span class="text-[7px] uppercase font-bold theme-text-dim">Esp</span>
+                            </button>
                         </div>
                     </div>
                 </div>
-            </section>
 
-            <!-- Tab: Protocolo de Acción (Foco/Rayo) -->
-            <section id="tab-action" class="tab-content flex-col p-8 w-full h-full items-center justify-center">
-                <div id="session-panel"
-                    class="glass p-12 rounded-[2.5rem] max-w-2xl w-full border-cyan-500/10 flex flex-col space-y-10 animate-fade-in relative overflow-hidden">
-                    <div id="matrix-rain" class="matrix-bg"></div>
-                    <div class="space-y-6 relative z-10 w-full">
-                        <h3 class="text-xs uppercase tracking-[0.4em] font-black" style="color: var(--accent);">
-                            Protocolo de Acción</h3>
-                        <div class="space-y-4">
-                            <label class="text-[9px] uppercase tracking-widest theme-text-dim ml-1">Esfera de
-                                Influencia</label>
-                            <div class="flex justify-between gap-4">
-                                <button onclick="selectPillar('pillar-op', this)"
-                                    class="pillar-btn p-3 rounded-2xl bg-white/5 flex-1 flex flex-col items-center active"><span
-                                        class="text-2xl">⚡</span><span
-                                        class="text-[8px] mt-2 theme-text-dim font-bold">OP</span></button>
-                                <button onclick="selectPillar('pillar-con', this)"
-                                    class="pillar-btn p-3 rounded-2xl bg-white/5 flex-1 flex flex-col items-center"><span
-                                        class="text-2xl">💎</span><span
-                                        class="text-[8px] mt-2 theme-text-dim font-bold">CON</span></button>
-                                <button onclick="selectPillar('pillar-vit', this)"
-                                    class="pillar-btn p-3 rounded-2xl bg-white/5 flex-1 flex flex-col items-center"><span
-                                        class="text-2xl">🌿</span><span
-                                        class="text-[8px] mt-2 theme-text-dim font-bold">VIT</span></button>
-                                <button onclick="selectPillar('pillar-chaos', this)"
-                                    class="pillar-btn p-3 rounded-2xl bg-white/5 flex-1 flex flex-col items-center"><span
-                                        class="text-2xl">🌀</span><span
-                                        class="text-[8px] mt-2 theme-text-dim font-bold">ESP</span></button>
-                            </div>
+                <!-- RIGHT PANEL: Hexagon Progress + Timer + Controls -->
+                <div class="flex-1 flex flex-col items-center justify-center space-y-8">
+                    <!-- Timer Display -->
+                    <div class="text-center space-y-2">
+                        <p id="session-status-text" class="text-[9px] uppercase tracking-[0.3em] theme-text-dim">Sistema
+                            en Espera</p>
+                        <div class="flex items-center justify-center gap-3">
+                            <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
+                            <span id="session-timer-display" class="text-6xl font-mono font-black tracking-wider"
+                                style="color: var(--accent);">00:00</span>
+                            <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
                         </div>
-                        <div class="flex flex-col border-b border-white/10 pb-4">
-                            <label class="text-[9px] uppercase tracking-widest theme-text-dim ml-1">Foco de
-                                Operación</label>
-                            <div class="flex items-center space-x-6 mt-2">
-                                <span id="session-timer-display" class="text-2xl font-mono font-bold"
-                                    style="color: var(--accent); opacity: 0.6;">00:00</span>
-                                <input id="current-activity-input" type="text" placeholder="¿En qué estás operando?"
-                                    class="w-full bg-transparent text-2xl theme-text-main focus:outline-none font-light italic">
+                    </div>
+
+                    <!-- Hexagon Progress Grid -->
+                    <div id="hex-progress-container" class="hidden animate-fade-in">
+                        <div class="flex flex-col items-center space-y-4">
+                            <p class="text-[8px] uppercase tracking-[0.5em] theme-text-dim font-bold">Flujo Temporal</p>
+                            <div id="hex-progress-grid"
+                                class="flex flex-wrap justify-center gap-4 max-w-2xl p-6 glass rounded-2xl border border-cyan-500/20">
+                                <!-- Hexagons dynamically added -->
                             </div>
                         </div>
                     </div>
+
+                    <!-- Action Button -->
                     <button id="session-main-btn" onclick="handleSessionTrigger()"
-                        class="group relative w-full py-6 theme-bg-accent text-[12px] uppercase font-black tracking-[0.6em] rounded-2xl overflow-hidden hover:scale-[1.02] transition-all">
+                        class="group relative w-full max-w-md py-6 theme-bg-accent text-[13px] uppercase font-black tracking-[0.6em] rounded-xl overflow-hidden hover:scale-[1.02] active:scale-[0.99] transition-all shadow-xl shadow-cyan-500/20">
                         <span id="session-btn-text" class="relative z-10">INICIAR SECUENCIA</span>
+                        <div class="btn-scan-line"></div>
                     </button>
                 </div>
             </section>

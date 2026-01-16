@@ -8,7 +8,10 @@ let totalYears = parseInt(localStorage.getItem(LS_KEY_EXPECTANCY)) || 90;
 let isSessionActive = false;
 let sessionStartTime = null;
 let selectedAnomalyDate = null;
-const ENERGY_ICONS = { bolt: '⚡', diamond: '💠', aura: '🟣' };
+let selectedCategory = null;
+let hexProgressInterval = null;
+let currentHexIndex = 0;
+const ENERGY_ICONS = { low: '🧊', fluid: '⚡', overload: '🔥' };
 const PILLAR_COLORS = {
     'pillar-op': '#c4a7e7',    // Violeta (Foco/Sabiduría)
     'pillar-con': '#ebbcba',   // Rose Gold (Humanidad)
@@ -72,10 +75,14 @@ function updateSystemClock() {
             const mins = Math.floor(diff / 60000).toString().padStart(2, '0');
             const secs = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
             sessionTimer.innerText = `${mins}:${secs}`;
+
+            // Update hexagon progress
+            updateHexProgress(diff);
         }
 
-        const dayTab = document.getElementById('tab-day');
-        if (dayTab && dayTab.classList.contains('active')) {
+        const lifeTab = document.getElementById('tab-life');
+        const dayView = document.getElementById('day-view-container');
+        if (lifeTab && lifeTab.classList.contains('active') && dayView && !dayView.classList.contains('hidden')) {
             renderDayClock();
         }
     }
@@ -121,14 +128,18 @@ function switchTab(id) {
             calibration.classList.add('hidden');
             mainContent.classList.remove('hidden');
             mainContent.style.display = 'flex';
-            renderLifeGrid('years');
+
+            // Check current active view mode in buttons
+            const activeBtn = document.querySelector('.view-btn.text-cyan-400');
+            const mode = activeBtn ? activeBtn.id.replace('view-', '') : 'years';
+            renderLifeGrid(mode);
         }
     }
 
     // Logic for Ciclo Circadiano (day)
     if (id === 'day') {
-        renderDayClock();
-        renderFrequencyMirror();
+        switchTab('life');
+        renderLifeGrid('days');
     }
 }
 
@@ -158,14 +169,32 @@ function renderLifeGrid(mode) {
         gap = '4px';
         label = 'Meses Vividos';
     }
-    else {
-        // weeks
+    else if (mode === 'weeks') {
         total = totalYears * 52;
         lived = Math.floor((today - birth) / (604800000));
         cols = 52;
         gap = '2px';
         label = 'Semanas Vividas';
     }
+    else if (mode === 'days') {
+        // Toggle Containers
+        document.getElementById('macro-view-container').style.display = 'none';
+        document.getElementById('day-view-container').classList.remove('hidden');
+        document.getElementById('day-view-container').style.display = 'flex';
+
+        renderDayClock();
+        renderFrequencyMirror();
+
+        // Active button state
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('bg-white/10', 'border-cyan-400', 'text-cyan-400'));
+        document.getElementById('view-days').classList.add('bg-white/10', 'border-cyan-400', 'text-cyan-400');
+        return;
+    }
+
+    // Default: Show Macro View
+    document.getElementById('macro-view-container').style.display = 'flex';
+    document.getElementById('day-view-container').style.display = 'none';
+    document.getElementById('day-view-container').classList.add('hidden');
 
     if (lived < 0) lived = 0;
 
@@ -305,12 +334,28 @@ function selectPillar(id, btn) {
 
 function selectEnergy(type, btn) {
     selectedEnergyMark = type;
-    document.querySelectorAll('.energy-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    document.querySelectorAll('.energy-btn').forEach(b => {
+        b.classList.remove('active', 'border-cyan-400', 'bg-cyan-500/20');
+        b.style.opacity = '0.4';
+    });
+    btn.classList.add('active', 'border-cyan-400', 'bg-cyan-500/20');
+    btn.style.opacity = '1';
+}
+
+function selectCategory(cat, btn) {
+    if (selectedCategory === cat) {
+        selectedCategory = null;
+        btn.classList.remove('bg-cyan-500/30', 'border-cyan-400');
+    } else {
+        selectedCategory = cat;
+        document.querySelectorAll('.category-chip').forEach(b => b.classList.remove('bg-cyan-500/30', 'border-cyan-400'));
+        btn.classList.add('bg-cyan-500/30', 'border-cyan-400');
+    }
 }
 
 function handleSessionTrigger() {
     const input = document.getElementById('current-activity-input');
+    const categorySelect = document.getElementById('category-select');
     const btn = document.getElementById('session-main-btn');
     const btnText = document.getElementById('session-btn-text');
     const statusText = document.getElementById('session-status-text');
@@ -318,46 +363,76 @@ function handleSessionTrigger() {
     const panel = document.getElementById('session-panel');
 
     if (!isSessionActive) {
+        // START SESSION
         const task = input.value.trim();
-        if (!task) { alert("Sajor, define tu foco de operación."); return; }
+        const category = categorySelect.value;
+
+        if (!task) {
+            alert("Sajor, necesitas describir tu actividad primero.");
+            return;
+        }
+
+        const fullAction = category ? `[${category}] ${task}` : task;
 
         isSessionActive = true;
         sessionStartTime = new Date();
 
+        // Visual State: Active Session
         btn.style.background = '#e67e80';
         btn.style.color = 'white';
         btn.classList.add('scanning');
-        btnText.innerText = "SELLAR ACCIÓN";
-        statusText.innerText = `OPERANDO EN: ${task.toUpperCase()}`;
+        btnText.innerText = "PARAR SESIÓN";
+        statusText.innerText = `EN MISIÓN: ${fullAction.toUpperCase()}`;
         statusText.style.color = 'var(--accent)';
+
         input.disabled = true;
+        categorySelect.disabled = true;
 
         if (panel) panel.classList.add('session-active');
+
+        // Start hexagon progress visualization
+        startHexProgress();
     } else {
+        // STOP SESSION
         const task = input.value;
+        const category = categorySelect.value;
+        const fullAction = category ? `[${category}] ${task}` : task;
         const endTime = new Date();
         const duration = Math.round((endTime - sessionStartTime) / 60000);
         const startStr = sessionStartTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
         const endStr = endTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
-        saveSessionData(task, startStr, endStr, duration, selectedPillarCode, selectedEnergyMark);
+        saveSessionData(fullAction, startStr, endStr, duration, selectedPillarCode, selectedEnergyMark);
 
         isSessionActive = false;
         sessionStartTime = null;
 
+        // Visual State: Reset
         btn.style.background = '';
         btn.style.color = '';
         btn.classList.remove('scanning');
         btnText.innerText = "INICIAR SECUENCIA";
-        statusText.innerText = "Operación sellada en la Matrix.";
-        statusText.style.color = 'var(--text-dim)';
+        statusText.innerText = "Operación sellada con éxito.";
+        statusText.style.color = '#4ade80';
 
         input.disabled = false;
+        categorySelect.disabled = false;
         input.value = "";
+        categorySelect.value = "";
         timerDisplay.innerText = "00:00";
 
         if (panel) panel.classList.remove('session-active');
+
+        // Stop hexagon progress
+        stopHexProgress();
+
         renderDayClock();
+
+        // Reset status after 3 seconds
+        setTimeout(() => {
+            statusText.innerText = "Sistema en Espera";
+            statusText.style.color = '';
+        }, 3000);
     }
 }
 
@@ -421,23 +496,19 @@ function renderDayClock() {
         const oldMark = hex.querySelector('.energy-mark');
         if (oldMark) oldMark.remove();
 
-        if (session) {
-            hex.classList.add('bg-cyan-500');
-            hex.style.boxShadow = '0 0 15px #00f2ff';
-
-            // Add Energy Mark INSIDE (Centered via CSS)
-            const mark = document.createElement('div');
-            mark.className = 'energy-mark';
-            mark.innerText = ENERGY_ICONS[session.energy] || '💠';
-            hex.appendChild(mark);
-        } else if (i < currentHour) {
-            hex.classList.add('bg-cyan-500/20', 'border', 'border-cyan-500/20');
-        } else {
-            hex.classList.add('bg-white/5', 'border', 'border-white/5');
-        }
-
         if (i === currentHour) {
+            // Current Time: Brilliant white pulsing highlight
             hex.classList.add('pulse-circular');
+        } else if (i < currentHour) {
+            // Past Time: Colored to show time already elapsed (Cyan)
+            hex.classList.add('bg-cyan-500/60', 'border', 'border-cyan-500/40');
+            // If there was a session, maybe a bit more opacity to distinguish but still flat
+            if (session) {
+                hex.classList.add('opacity-100');
+            }
+        } else {
+            // Future Time: Dark/Grey (Wait state)
+            hex.classList.add('bg-white/5', 'border', 'border-white/5');
         }
     }
 }
@@ -565,3 +636,81 @@ function renderFrequencyMirror() {
         if (val) val.innerText = `${percent}%`;
     }
 }
+
+// HEXAGON PROGRESS VISUALIZATION
+function startHexProgress() {
+    const container = document.getElementById('hex-progress-container');
+    const grid = document.getElementById('hex-progress-grid');
+
+    if (!container || !grid) return;
+
+    // Show container and reset
+    container.classList.remove('hidden');
+    grid.innerHTML = '';
+    currentHexIndex = 0;
+
+    // Create first hexagon
+    createHexagon(0);
+}
+
+function createHexagon(index) {
+    const grid = document.getElementById('hex-progress-grid');
+    if (!grid) return;
+
+    const hexContainer = document.createElement('div');
+    hexContainer.className = 'hex-progress hex-shape active';
+    hexContainer.id = `hex-progress-${index}`;
+
+    const hexBg = document.createElement('div');
+    hexBg.className = 'hex-progress-bg hex-shape';
+
+    const hexFill = document.createElement('div');
+    hexFill.className = 'hex-progress-fill hex-shape';
+    hexFill.id = `hex-fill-${index}`;
+
+    hexBg.appendChild(hexFill);
+    hexContainer.appendChild(hexBg);
+    grid.appendChild(hexContainer);
+}
+
+function updateHexProgress(totalMs) {
+    const totalSeconds = Math.floor(totalMs / 1000);
+    const currentMinuteIndex = Math.floor(totalSeconds / 60);
+    const secondsInCurrentMinute = totalSeconds % 60;
+    const percentInCurrentMinute = (secondsInCurrentMinute / 60) * 100;
+
+    // Create new hexagons if needed
+    if (currentMinuteIndex > currentHexIndex) {
+        // Mark previous hexagon as completed
+        const prevHex = document.getElementById(`hex-progress-${currentHexIndex}`);
+        if (prevHex) {
+            prevHex.classList.remove('active');
+            prevHex.classList.add('completed');
+        }
+
+        currentHexIndex = currentMinuteIndex;
+        createHexagon(currentHexIndex);
+    }
+
+    // Update current hexagon fill
+    const currentFill = document.getElementById(`hex-fill-${currentHexIndex}`);
+    if (currentFill) {
+        currentFill.style.height = `${percentInCurrentMinute}%`;
+    }
+}
+
+function stopHexProgress() {
+    const container = document.getElementById('hex-progress-container');
+    if (container) {
+        container.classList.add('hidden');
+    }
+
+    currentHexIndex = 0;
+
+    // Clear interval if exists
+    if (hexProgressInterval) {
+        clearInterval(hexProgressInterval);
+        hexProgressInterval = null;
+    }
+}
+
