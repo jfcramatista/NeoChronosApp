@@ -10,15 +10,18 @@ let sessionStartTime = null;
 let selectedAnomalyDate = null;
 const ENERGY_ICONS = { bolt: '⚡', diamond: '💠', aura: '🟣' };
 const PILLAR_COLORS = {
-    'pillar-op': '#00f2ff',
-    'pillar-con': '#ff007a',
-    'pillar-vit': '#39ff14',
-    'pillar-chaos': '#f0f000'
+    'pillar-op': '#c4a7e7',    // Violeta (Foco/Sabiduría)
+    'pillar-con': '#ebbcba',   // Rose Gold (Humanidad)
+    'pillar-vit': '#31748f',   // Pine Blue (Vitalidad Serena)
+    'pillar-chaos': '#f6c177'  // Amber Gold (Espíritu/Caos)
 };
+const LS_KEY_THEME = 'neo-chronos-theme';
 
 document.addEventListener('DOMContentLoaded', () => {
     const birth = localStorage.getItem(LS_KEY_BIRTH);
-    const expectancy = localStorage.getItem(LS_KEY_EXPECTANCY);
+    const savedTheme = localStorage.getItem(LS_KEY_THEME) || 'dark';
+
+    setLifeTheme(savedTheme);
 
     if (!birth) {
         const overlay = document.getElementById('onboarding-overlay');
@@ -35,6 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateSystemClock, 1000);
     updateSystemClock();
 });
+
+function setLifeTheme(themeId) {
+    document.documentElement.setAttribute('data-theme', themeId);
+    localStorage.setItem(LS_KEY_THEME, themeId);
+}
+
 
 function updateSystemClock() {
     const timeEl = document.getElementById('current-time-big');
@@ -75,19 +84,31 @@ function updateSystemClock() {
 function switchTab(id) {
     const birth = localStorage.getItem(LS_KEY_BIRTH);
 
-    // UI Cleanup
-    document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+    // UI Cleanup: Hide all content, remove active states from all buttons
+    document.querySelectorAll('.tab-content').forEach(e => {
+        e.classList.remove('active');
+        e.style.display = 'none';
+    });
     document.querySelectorAll('.nav-btn').forEach(b => {
-        b.classList.remove('text-cyan-400', 'glass-active');
+        b.classList.remove('glass-active');
+        b.style.color = 'var(--text-dim)';
     });
 
+    // Activate selected content
     const currentTab = document.getElementById('tab-' + id);
-    if (currentTab) currentTab.classList.add('active');
+    if (currentTab) {
+        currentTab.classList.add('active');
+        currentTab.style.display = 'flex';
+    }
 
+    // Activate selected button
     const btn = document.getElementById('btn-' + id);
-    if (btn) btn.classList.add('text-cyan-400', 'glass-active');
+    if (btn) {
+        btn.classList.add('glass-active');
+        btn.style.color = 'var(--accent)';
+    }
 
-    // Logic for Life Tab
+    // Logic for Macro-Matrix (life)
     if (id === 'life') {
         const calibration = document.getElementById('life-calibration');
         const mainContent = document.getElementById('life-main-content');
@@ -100,10 +121,11 @@ function switchTab(id) {
             calibration.classList.add('hidden');
             mainContent.classList.remove('hidden');
             mainContent.style.display = 'flex';
-            renderLifeGrid('years'); // Start with Years as requested
+            renderLifeGrid('years');
         }
     }
 
+    // Logic for Ciclo Circadiano (day)
     if (id === 'day') {
         renderDayClock();
         renderFrequencyMirror();
@@ -293,9 +315,7 @@ function handleSessionTrigger() {
     const btnText = document.getElementById('session-btn-text');
     const statusText = document.getElementById('session-status-text');
     const timerDisplay = document.getElementById('session-timer-display');
-
     const panel = document.getElementById('session-panel');
-    const centralHex = document.querySelector('.hour-progress-hex');
 
     if (!isSessionActive) {
         const task = input.value.trim();
@@ -304,18 +324,15 @@ function handleSessionTrigger() {
         isSessionActive = true;
         sessionStartTime = new Date();
 
-        btn.classList.replace('bg-cyan-500', 'bg-red-500');
+        btn.style.background = '#e67e80';
+        btn.style.color = 'white';
         btn.classList.add('scanning');
         btnText.innerText = "SELLAR ACCIÓN";
         statusText.innerText = `OPERANDO EN: ${task.toUpperCase()}`;
-        statusText.classList.replace('text-white/30', 'text-cyan-400');
+        statusText.style.color = 'var(--accent)';
         input.disabled = true;
 
         if (panel) panel.classList.add('session-active');
-        if (centralHex) {
-            centralHex.classList.add('active-pulse');
-            centralHex.style.setProperty('--pulse-pilar', PILLAR_COLORS[selectedPillarCode]);
-        }
     } else {
         const task = input.value;
         const endTime = new Date();
@@ -328,19 +345,18 @@ function handleSessionTrigger() {
         isSessionActive = false;
         sessionStartTime = null;
 
-        btn.classList.replace('bg-red-500', 'bg-cyan-500');
+        btn.style.background = '';
+        btn.style.color = '';
         btn.classList.remove('scanning');
         btnText.innerText = "INICIAR SECUENCIA";
         statusText.innerText = "Operación sellada en la Matrix.";
-        statusText.classList.replace('text-cyan-400', 'text-white/30');
+        statusText.style.color = 'var(--text-dim)';
 
         input.disabled = false;
         input.value = "";
         timerDisplay.innerText = "00:00";
 
         if (panel) panel.classList.remove('session-active');
-        if (centralHex) centralHex.classList.remove('active-pulse');
-
         renderDayClock();
     }
 }
