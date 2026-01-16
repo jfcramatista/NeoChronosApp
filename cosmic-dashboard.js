@@ -637,7 +637,7 @@ function renderFrequencyMirror() {
     }
 }
 
-// HEXAGON PROGRESS VISUALIZATION
+// HEXAGON PROGRESS VISUALIZATION - 1 Large Hex with 60 Mini Hexes
 function startHexProgress() {
     const container = document.getElementById('hex-progress-container');
     const grid = document.getElementById('hex-progress-grid');
@@ -649,53 +649,76 @@ function startHexProgress() {
     grid.innerHTML = '';
     currentHexIndex = 0;
 
-    // Create first hexagon
-    createHexagon(0);
+    // Create first hour hexagon (large container with 60 mini hexagons)
+    createHourHexagon(0);
 }
 
-function createHexagon(index) {
+function createHourHexagon(hourIndex) {
     const grid = document.getElementById('hex-progress-grid');
     if (!grid) return;
 
-    const hexContainer = document.createElement('div');
-    hexContainer.className = 'hex-progress hex-shape active';
-    hexContainer.id = `hex-progress-${index}`;
+    // Create large hexagon container
+    const hourContainer = document.createElement('div');
+    hourContainer.className = 'hex-hour-container';
+    hourContainer.id = `hex-hour-${hourIndex}`;
 
-    const hexBg = document.createElement('div');
-    hexBg.className = 'hex-progress-bg hex-shape';
+    // Background hexagon shape
+    const hourBg = document.createElement('div');
+    hourBg.className = 'hex-hour-bg';
 
-    const hexFill = document.createElement('div');
-    hexFill.className = 'hex-progress-fill hex-shape';
-    hexFill.id = `hex-fill-${index}`;
+    // Grid for 60 mini hexagons (10x6)
+    const minuteGrid = document.createElement('div');
+    minuteGrid.className = 'hex-minute-grid';
+    minuteGrid.id = `minute-grid-${hourIndex}`;
 
-    hexBg.appendChild(hexFill);
-    hexContainer.appendChild(hexBg);
-    grid.appendChild(hexContainer);
+    // Create 60 minute hexagons
+    for (let i = 0; i < 60; i++) {
+        const miniHex = document.createElement('div');
+        miniHex.className = 'hex-minute';
+        miniHex.id = `minute-${hourIndex}-${i}`;
+        minuteGrid.appendChild(miniHex);
+    }
+
+    // Label
+    const label = document.createElement('div');
+    label.className = 'hex-hour-label';
+    label.innerText = `Hora ${hourIndex + 1}`;
+
+    hourContainer.appendChild(hourBg);
+    hourContainer.appendChild(minuteGrid);
+    hourContainer.appendChild(label);
+    grid.appendChild(hourContainer);
 }
 
 function updateHexProgress(totalMs) {
     const totalSeconds = Math.floor(totalMs / 1000);
-    const currentMinuteIndex = Math.floor(totalSeconds / 60);
-    const secondsInCurrentMinute = totalSeconds % 60;
-    const percentInCurrentMinute = (secondsInCurrentMinute / 60) * 100;
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const currentHourIndex = Math.floor(totalMinutes / 60);
+    const minuteInCurrentHour = totalMinutes % 60;
 
-    // Create new hexagons if needed
-    if (currentMinuteIndex > currentHexIndex) {
-        // Mark previous hexagon as completed
-        const prevHex = document.getElementById(`hex-progress-${currentHexIndex}`);
-        if (prevHex) {
-            prevHex.classList.remove('active');
-            prevHex.classList.add('completed');
-        }
-
-        currentHexIndex = currentMinuteIndex;
-        createHexagon(currentHexIndex);
+    // Create new hour hexagon if needed
+    if (currentHourIndex > currentHexIndex) {
+        currentHexIndex = currentHourIndex;
+        createHourHexagon(currentHexIndex);
     }
 
-    // Update current hexagon fill
-    const currentFill = document.getElementById(`hex-fill-${currentHexIndex}`);
-    if (currentFill) {
-        currentFill.style.height = `${percentInCurrentMinute}%`;
+    // Update mini hexagons in current hour
+    for (let i = 0; i < 60; i++) {
+        const miniHex = document.getElementById(`minute-${currentHexIndex}-${i}`);
+        if (!miniHex) continue;
+
+        if (i < minuteInCurrentHour) {
+            // Filled minutes
+            miniHex.classList.remove('active');
+            miniHex.classList.add('filled');
+        } else if (i === minuteInCurrentHour) {
+            // Current active minute
+            miniHex.classList.remove('filled');
+            miniHex.classList.add('active');
+        } else {
+            // Future minutes
+            miniHex.classList.remove('filled', 'active');
+        }
     }
 }
 
@@ -713,4 +736,3 @@ function stopHexProgress() {
         hexProgressInterval = null;
     }
 }
-
