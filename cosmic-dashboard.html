@@ -347,6 +347,90 @@
             text-shadow: 0 0 10px rgba(0, 242, 255, 0.8);
         }
 
+        /* PILLAR COLORS */
+        .pillar-op {
+            background: #00f2ff !important;
+            box-shadow: 0 0 15px #00f2ff !important;
+            border: 1px solid #fff !important;
+        }
+
+        /* Cyan - Operación */
+        .pillar-con {
+            background: #ff007a !important;
+            box-shadow: 0 0 15px #ff007a !important;
+            border: 1px solid #fff !important;
+        }
+
+        /* Rose - Conexión */
+        .pillar-vit {
+            background: #39ff14 !important;
+            box-shadow: 0 0 15px #39ff14 !important;
+            border: 1px solid #fff !important;
+        }
+
+        /* Green - Vitalidad */
+        .pillar-chaos {
+            background: #f0f000 !important;
+            box-shadow: 0 0 15px #f0f000 !important;
+            border: 1px solid #fff !important;
+        }
+
+        /* Yellow - Espíritu */
+
+        /* ENERGY MARKS */
+        .energy-mark {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* FREQUENCY MIRROR */
+        .mirror-container {
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            width: 100%;
+        }
+
+        .frequency-bar-bg {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .frequency-bar-fill {
+            height: 100%;
+            transition: width 1s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .pillar-btn {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .pillar-btn.active {
+            border-color: #fff;
+            transform: scale(1.1);
+        }
+
+        .energy-btn {
+            opacity: 0.4;
+            transition: all 0.3s;
+        }
+
+        .energy-btn.active {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
         .hour-progress-sublabel {
             position: relative;
             z-index: 10;
@@ -495,7 +579,63 @@
                                 <!-- JS will inject 24 hex-hours in a circle -->
                             </div>
                             <div class="mt-4 text-[8px] text-white/20 uppercase tracking-[0.4em]">Cronómetro Circadiano
-                                Octogonal</div>
+                            </div>
+
+                            <!-- The Frequency Mirror -->
+                            <div class="mirror-container w-full max-w-sm mt-12 animate-fade-in">
+                                <h4 class="text-[9px] uppercase tracking-[0.4em] text-white/30 mb-8 text-center italic">
+                                    Espejo de Frecuencias de Vida</h4>
+                                <div class="space-y-4">
+                                    <div class="space-y-1">
+                                        <div
+                                            class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
+                                            <span class="text-cyan-400">Operación</span>
+                                            <span id="mirror-val-op" class="text-white">0%</span>
+                                        </div>
+                                        <div class="frequency-bar-bg">
+                                            <div id="mirror-fill-op" class="frequency-bar-fill"
+                                                style="width:0%; background:#00f2ff; box-shadow:0 0 10px #00f2ff;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div
+                                            class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
+                                            <span class="text-pink-400">Conexión</span>
+                                            <span id="mirror-val-con" class="text-white">0%</span>
+                                        </div>
+                                        <div class="frequency-bar-bg">
+                                            <div id="mirror-fill-con" class="frequency-bar-fill"
+                                                style="width:0%; background:#ff007a; box-shadow:0 0 10px #ff007a;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div
+                                            class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
+                                            <span class="text-green-400">Vitalidad</span>
+                                            <span id="mirror-val-vit" class="text-white">0%</span>
+                                        </div>
+                                        <div class="frequency-bar-bg">
+                                            <div id="mirror-fill-vit" class="frequency-bar-fill"
+                                                style="width:0%; background:#39ff14; box-shadow:0 0 10px #39ff14;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div
+                                            class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
+                                            <span class="text-yellow-400">Espíritu</span>
+                                            <span id="mirror-val-chaos" class="text-white">0%</span>
+                                        </div>
+                                        <div class="frequency-bar-bg">
+                                            <div id="mirror-fill-chaos" class="frequency-bar-fill"
+                                                style="width:0%; background:#f0f000; box-shadow:0 0 10px #f0f000;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Actions & Focal Point -->
@@ -508,19 +648,68 @@
                             </div>
 
                             <!-- INPUT AREA -->
-                            <div id="session-input-area" class="space-y-4">
+                            <div id="session-input-area" class="space-y-6">
                                 <h3 id="session-title"
                                     class="text-xs uppercase tracking-[0.3em] text-cyan-400 font-bold">Protocolo de
                                     Acción</h3>
-                                <div class="flex items-center space-x-4 border-b border-white/20">
-                                    <span id="session-timer-display"
-                                        class="text-sm font-mono text-cyan-500 opacity-60">00:00</span>
-                                    <input id="current-activity-input" type="text" placeholder="¿En qué estás operando?"
-                                        class="w-full bg-transparent py-4 text-xl text-white focus:outline-none focus:border-cyan-500 font-light transition-all">
+
+                                <div class="space-y-2">
+                                    <label class="text-[9px] uppercase tracking-widest text-white/30 ml-1">Esfera de
+                                        Influencia</label>
+                                    <div class="flex justify-between gap-2">
+                                        <button onclick="selectPillar('pillar-op', this)"
+                                            class="pillar-btn p-2 rounded-lg bg-cyan-400/10 flex-1 flex flex-col items-center group active">
+                                            <span class="text-[14px]">⚡</span>
+                                            <span class="text-[7px] mt-1 text-white/40 group-hover:text-white">OP</span>
+                                        </button>
+                                        <button onclick="selectPillar('pillar-con', this)"
+                                            class="pillar-btn p-2 rounded-lg bg-pink-400/10 flex-1 flex flex-col items-center group">
+                                            <span class="text-[14px]">💎</span>
+                                            <span
+                                                class="text-[7px] mt-1 text-white/40 group-hover:text-white">CON</span>
+                                        </button>
+                                        <button onclick="selectPillar('pillar-vit', this)"
+                                            class="pillar-btn p-2 rounded-lg bg-green-400/10 flex-1 flex flex-col items-center group">
+                                            <span class="text-[14px]">🌿</span>
+                                            <span
+                                                class="text-[7px] mt-1 text-white/40 group-hover:text-white">VIT</span>
+                                        </button>
+                                        <button onclick="selectPillar('pillar-chaos', this)"
+                                            class="pillar-btn p-2 rounded-lg bg-yellow-400/10 flex-1 flex flex-col items-center group">
+                                            <span class="text-[14px]">🌀</span>
+                                            <span
+                                                class="text-[7px] mt-1 text-white/40 group-hover:text-white">ESP</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <label class="text-[9px] uppercase tracking-widest text-white/30 ml-1">Estado de
+                                        Sincronía</label>
+                                    <div class="flex gap-4 justify-around py-2 glass rounded-xl border border-white/5">
+                                        <button onclick="selectEnergy('bolt', this)"
+                                            class="energy-btn text-xl filter drop-shadow-[0_0_5px_white]">⚡</button>
+                                        <button onclick="selectEnergy('diamond', this)"
+                                            class="energy-btn text-xl active filter drop-shadow-[0_0_5px_cyan]">💠</button>
+                                        <button onclick="selectEnergy('aura', this)"
+                                            class="energy-btn text-xl filter drop-shadow-[0_0_8px_purple]">🟣</button>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col border-b border-white/20">
+                                    <label class="text-[9px] uppercase tracking-widest text-white/30 ml-1">Foco de
+                                        Operación</label>
+                                    <div class="flex items-center space-x-4">
+                                        <span id="session-timer-display"
+                                            class="text-sm font-mono text-cyan-500 opacity-60">00:00</span>
+                                        <input id="current-activity-input" type="text"
+                                            placeholder="¿En qué estás operando?"
+                                            class="w-full bg-transparent py-4 text-xl text-white focus:outline-none focus:border-cyan-500 font-light transition-all">
+                                    </div>
                                 </div>
                                 <p id="session-status-text"
-                                    class="text-[9px] text-white/30 uppercase tracking-widest mt-2">Sistema a la espera
-                                    de comando inicial.</p>
+                                    class="text-[9px] text-white/30 uppercase tracking-widest mt-2 text-center">Sistema
+                                    listo para nueva secuencia.</p>
                             </div>
 
                             <!-- DYNAMIC BUTTON -->
@@ -539,11 +728,24 @@
                                     Bitácora de la Hora</h4>
                                 <div class="bg-white/5 p-4 rounded-xl space-y-2">
                                     <div class="text-lg text-white font-light line-clamp-2" id="bitacora-task">--</div>
-                                    <div class="flex justify-between items-center text-[10px] font-mono">
+                                    <div class="flex justify-between items-center text-[10px] font-mono mb-2">
                                         <span class="text-white/40">TIEMPO: <span id="bitacora-time"
                                                 class="text-cyan-400">--:--</span></span>
                                         <span class="text-white/40">DURACIÓN: <span id="bitacora-duration"
                                                 class="text-cyan-400">-- min</span></span>
+                                    </div>
+                                    <div class="flex justify-between items-center pt-2 border-t border-white/5">
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="text-[8px] text-white/20 uppercase tracking-widest">Esfera:</span>
+                                            <span id="bitacora-pillar"
+                                                class="text-[9px] text-white font-bold uppercase tracking-widest">---</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="text-[8px] text-white/20 uppercase tracking-widest">Núcleo:</span>
+                                            <span id="bitacora-energy" class="text-[9px]">---</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

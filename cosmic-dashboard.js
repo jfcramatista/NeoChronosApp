@@ -1,11 +1,14 @@
 const LS_KEY_BIRTH = 'neo-chronos-birthdate';
 const LS_KEY_EXPECTANCY = 'neo-chronos-expectancy';
 const LS_KEY_DAY_DATA = 'neo-chronos-day-data';
+let selectedPillarCode = 'pillar-op';
+let selectedEnergyMark = 'diamond';
 const LS_KEY_ANOMALIES = 'neo-chronos-anomalies';
 let totalYears = parseInt(localStorage.getItem(LS_KEY_EXPECTANCY)) || 90;
 let isSessionActive = false;
 let sessionStartTime = null;
 let selectedAnomalyDate = null;
+const ENERGY_ICONS = { bolt: '⚡', diamond: '💠', aura: '🟣' };
 
 document.addEventListener('DOMContentLoaded', () => {
     const birth = localStorage.getItem(LS_KEY_BIRTH);
@@ -97,6 +100,7 @@ function switchTab(id) {
 
     if (id === 'day') {
         renderDayClock();
+        renderFrequencyMirror();
     }
 }
 
@@ -257,6 +261,18 @@ function resetSystem() {
     }
 }
 
+function selectPillar(id, btn) {
+    selectedPillarCode = id;
+    document.querySelectorAll('.pillar-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+function selectEnergy(type, btn) {
+    selectedEnergyMark = type;
+    document.querySelectorAll('.energy-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
 function handleSessionTrigger() {
     const input = document.getElementById('current-activity-input');
     const btn = document.getElementById('session-main-btn');
@@ -283,7 +299,7 @@ function handleSessionTrigger() {
         const startStr = sessionStartTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
         const endStr = endTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
-        saveSessionData(task, startStr, endStr, duration);
+        saveSessionData(task, startStr, endStr, duration, selectedPillarCode, selectedEnergyMark);
 
         isSessionActive = false;
         sessionStartTime = null;
@@ -300,21 +316,23 @@ function handleSessionTrigger() {
     }
 }
 
-function saveSessionData(task, start, end, duration) {
+function saveSessionData(task, start, end, duration, pillar, energy) {
     const dayData = JSON.parse(localStorage.getItem(LS_KEY_DAY_DATA) || '{}');
     const todayStr = new Date().toISOString().split('T')[0];
 
     if (!dayData[todayStr]) dayData[todayStr] = {};
 
-    // Store in the hour it started
     const startHour = parseInt(start.split(':')[0]);
     dayData[todayStr][startHour] = {
         task: task,
         time: `${start} - ${end}`,
-        duration: duration
+        duration: duration,
+        pillar: pillar,
+        energy: energy
     };
 
     localStorage.setItem(LS_KEY_DAY_DATA, JSON.stringify(dayData));
+    renderFrequencyMirror();
 }
 
 function renderDayClock() {
@@ -351,12 +369,22 @@ function renderDayClock() {
         const hex = document.getElementById(`hex-hour-${i}`);
         const session = sessions[i];
 
-        hex.classList.remove('bg-cyan-500', 'bg-cyan-500/40', 'pulse-grid', 'pulse-circular', 'bg-white/5', 'border-white/5');
+        hex.classList.remove('bg-cyan-500', 'bg-cyan-500/40', 'pulse-grid', 'pulse-circular', 'bg-white/5', 'border-white/5', 'pillar-op', 'pillar-con', 'pillar-vit', 'pillar-chaos');
         hex.style.boxShadow = 'none';
+
+        // Remove old energy marks
+        const oldMark = hex.querySelector('.energy-mark');
+        if (oldMark) oldMark.remove();
 
         if (session) {
             hex.classList.add('bg-cyan-500');
             hex.style.boxShadow = '0 0 15px #00f2ff';
+
+            // Add Energy Mark INSIDE (Centered via CSS)
+            const mark = document.createElement('div');
+            mark.className = 'energy-mark';
+            mark.innerText = ENERGY_ICONS[session.energy] || '💠';
+            hex.appendChild(mark);
         } else if (i < currentHour) {
             hex.classList.add('bg-cyan-500/20', 'border', 'border-cyan-500/20');
         } else {
@@ -378,6 +406,8 @@ function showBitacora(h) {
     const tField = document.getElementById('bitacora-task');
     const timeField = document.getElementById('bitacora-time');
     const durField = document.getElementById('bitacora-duration');
+    const pilarField = document.getElementById('bitacora-pillar');
+    const energyField = document.getElementById('bitacora-energy');
 
     if (!display) return;
 
@@ -385,10 +415,16 @@ function showBitacora(h) {
         tField.innerText = session.task;
         timeField.innerText = session.time;
         durField.innerText = `${session.duration} min`;
+
+        const pillarNames = { 'pillar-op': 'Operación', 'pillar-con': 'Conexión', 'pillar-vit': 'Vitalidad', 'pillar-chaos': 'Espíritu' };
+        if (pilarField) pilarField.innerText = pillarNames[session.pillar] || 'General';
+        if (energyField) energyField.innerText = ENERGY_ICONS[session.energy] || '---';
     } else {
         tField.innerText = "Sin registro de comando";
         timeField.innerText = `${h.toString().padStart(2, '0')}:00`;
         durField.innerText = "0 min";
+        if (pilarField) pilarField.innerText = "---";
+        if (energyField) energyField.innerText = "---";
     }
     display.style.opacity = "1";
 }
@@ -456,5 +492,31 @@ function deleteAnomaly() {
         const label = document.getElementById('stat-label').innerText;
         const mode = label.includes('Año') ? 'years' : (label.includes('Mes') ? 'months' : 'weeks');
         renderLifeGrid(mode);
+    }
+}
+function renderFrequencyMirror() {
+    const dayData = JSON.parse(localStorage.getItem(LS_KEY_DAY_DATA) || '{}');
+    const todayStr = new Date().toISOString().split('T')[0];
+    const sessions = dayData[todayStr] || {};
+
+    const counts = { 'pillar-op': 0, 'pillar-con': 0, 'pillar-vit': 0, 'pillar-chaos': 0 };
+    let totalTime = 0;
+
+    Object.values(sessions).forEach(s => {
+        if (s.pillar) {
+            counts[s.pillar] += s.duration || 60; // default 60 if not specified
+            totalTime += s.duration || 60;
+        }
+    });
+
+    for (const [key, value] of Object.entries(counts)) {
+        const idSuffix = key.split('-')[1];
+        const percent = totalTime > 0 ? Math.round((value / totalTime) * 100) : 0;
+
+        const fill = document.getElementById(`mirror-fill-${idSuffix}`);
+        const val = document.getElementById(`mirror-val-${idSuffix}`);
+
+        if (fill) fill.style.width = `${percent}%`;
+        if (val) val.innerText = `${percent}%`;
     }
 }
