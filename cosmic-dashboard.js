@@ -31,6 +31,8 @@ function updateSystemClock() {
     const timeEl = document.getElementById('current-time-big');
     const dateEl = document.getElementById('current-date-full');
     const displayHourField = document.getElementById('display-hour-now');
+    const progressFill = document.getElementById('hour-progress-fill');
+    const progressPercent = document.getElementById('hour-progress-percent');
 
     if (timeEl && dateEl) {
         const now = new Date();
@@ -38,7 +40,15 @@ function updateSystemClock() {
         dateEl.innerText = now.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
 
         const currentHour = now.getHours();
+        const currentMinutes = now.getMinutes();
+        const currentSeconds = now.getSeconds();
+
         if (displayHourField) displayHourField.innerText = `${currentHour.toString().padStart(2, '0')}:00`;
+
+        // Calculate Hour Progress
+        const percent = Math.floor(((currentMinutes * 60 + currentSeconds) / 3600) * 100);
+        if (progressFill) progressFill.style.height = `${percent}%`;
+        if (progressPercent) progressPercent.innerText = `${percent}%`;
 
         // Auto-refresh pulse if in 'day' tab
         const dayTab = document.getElementById('tab-day');
@@ -225,7 +235,7 @@ function renderDayClock() {
     const hours = dayData[todayStr] || {};
     const currentHour = new Date().getHours();
 
-    if (container.children.length === 0) {
+    if (!document.getElementById('hex-hour-0')) {
         const radius = 160;
         const centerX = 190;
         const centerY = 190;
