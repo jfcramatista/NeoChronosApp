@@ -1,9 +1,11 @@
 const LS_KEY_BIRTH = 'neo-chronos-birthdate';
 const LS_KEY_EXPECTANCY = 'neo-chronos-expectancy';
 const LS_KEY_DAY_DATA = 'neo-chronos-day-data';
+const LS_KEY_ANOMALIES = 'neo-chronos-anomalies';
 let totalYears = parseInt(localStorage.getItem(LS_KEY_EXPECTANCY)) || 90;
-let timerInterval, timerStartTime, isTimerRunning = false;
-let selectedHour = null;
+let isSessionActive = false;
+let sessionStartTime = null;
+let selectedAnomalyDate = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     const birth = localStorage.getItem(LS_KEY_BIRTH);
@@ -16,13 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
             overlay.style.display = 'flex';
         }
     } else {
-        // Direct entry
         document.getElementById('setup-date').value = birth;
         document.getElementById('setup-expectancy').value = totalYears;
         switchTab('life');
     }
 
-    // Start Real-time Clock
     setInterval(updateSystemClock, 1000);
     updateSystemClock();
 });
@@ -30,9 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
 function updateSystemClock() {
     const timeEl = document.getElementById('current-time-big');
     const dateEl = document.getElementById('current-date-full');
-    const displayHourField = document.getElementById('display-hour-now');
     const progressFill = document.getElementById('hour-progress-fill');
     const progressPercent = document.getElementById('hour-progress-percent');
+    const sessionTimer = document.getElementById('session-timer-display');
 
     if (timeEl && dateEl) {
         const now = new Date();
@@ -43,14 +43,19 @@ function updateSystemClock() {
         const currentMinutes = now.getMinutes();
         const currentSeconds = now.getSeconds();
 
-        if (displayHourField) displayHourField.innerText = `${currentHour.toString().padStart(2, '0')}:00`;
-
         // Calculate Hour Progress
         const percent = Math.floor(((currentMinutes * 60 + currentSeconds) / 3600) * 100);
         if (progressFill) progressFill.style.height = `${percent}%`;
         if (progressPercent) progressPercent.innerText = `${percent}%`;
 
-        // Auto-refresh pulse if in 'day' tab
+        // Session Timer Update
+        if (isSessionActive && sessionStartTime && sessionTimer) {
+            const diff = now - sessionStartTime;
+            const mins = Math.floor(diff / 60000).toString().padStart(2, '0');
+            const secs = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+            sessionTimer.innerText = `${mins}:${secs}`;
+        }
+
         const dayTab = document.getElementById('tab-day');
         if (dayTab && dayTab.classList.contains('active')) {
             renderDayClock();
@@ -145,19 +150,60 @@ function renderLifeGrid(mode) {
     grid.style.gap = gap;
 
     const frag = document.createDocumentFragment();
+    const anomalies = JSON.parse(localStorage.getItem(LS_KEY_ANOMALIES) || '{}');
+
     for (let i = 0; i < total; i++) {
         const d = document.createElement('div');
         let statusClass = '';
+        let title = '';
+
+        // Calculate date for this cell
+        let cellDate = new Date(birth);
+        if (mode === 'years') cellDate.setFullYear(birth.getFullYear() + i);
+        else if (mode === 'months') cellDate.setMonth(birth.getMonth() + i);
+        else cellDate.setDate(birth.getDate() + (i * 7));
+
+        // Check for anomalies
+        const dateKey = cellDate.toISOString().split('T')[0];
+        // For simplicity in Year/Month view, we look for matches in the same period
+        let anomaly = null;
+        if (mode === 'years') {
+            const yearStr = cellDate.getFullYear().toString();
+            anomaly = Object.values(anomalies).find(a => a.date.startsWith(yearStr));
+        } else if (mode === 'months') {
+            const monthStr = cellDate.toISOString().substring(0, 7);
+            anomaly = Object.values(anomalies).find(a => a.date.startsWith(monthStr));
+        } else {
+            anomaly = anomalies[dateKey];
+        }
 
         if (i < lived) {
             statusClass = 'bg-cyan-500 opacity-60 hover:opacity-100 hover:bg-cyan-400';
+            if (anomaly) statusClass = `anomaly-${anomaly.type}`;
         } else if (i === lived) {
-            statusClass = 'current-pulse'; // THE PRESENT MOMENT
+            statusClass = 'pulse-grid';
         } else {
-            statusClass = 'bg-white/5 border border-white/5 hover:border-white/20';
+            statusClass = 'bg-white/5 border border-white/5 hover:border-cyan-500/30 cursor-pointer';
+            if (anomaly) statusClass = `anomaly-${anomaly.type}`;
         }
 
-        d.className = `aspect-square transition-all duration-300 hex-shape ${statusClass}`;
+        d.className = `aspect-square transition-all duration-300 hex-shape hex-cell-macro ${statusClass}`;
+
+        if (anomaly) {
+            const star = document.createElement('div');
+            star.className = 'star-particle';
+            d.appendChild(star);
+
+            const label = document.createElement('div');
+            label.className = 'anomaly-label';
+            label.innerText = anomaly.title;
+            d.appendChild(label);
+        }
+
+        if (i >= lived || anomaly) {
+            d.onclick = () => openAnomalyTerminal(dateKey);
+        }
+
         frag.appendChild(d);
     }
     grid.appendChild(frag);
@@ -188,22 +234,7 @@ function saveLifeCalibration() {
     }
 }
 
-function toggleTimer() {
-    const idleText = document.getElementById('timer-idle-text');
-    if (isTimerRunning) {
-        clearInterval(timerInterval); isTimerRunning = false;
-        if (idleText) { idleText.style.display = 'flex'; idleText.querySelector('span').innerText = 'REANUDAR'; }
-    } else {
-        timerStartTime = Date.now();
-        if (idleText) idleText.style.display = 'none';
-        isTimerRunning = true;
-        timerInterval = setInterval(() => {
-            const d = Date.now() - timerStartTime;
-            document.getElementById('timer-min').innerText = Math.floor(d / 60000).toString().padStart(2, '0');
-            document.getElementById('timer-sec').innerText = Math.floor((d % 60000) / 1000).toString().padStart(2, '0');
-        }, 100);
-    }
-}
+
 
 function saveSettings() {
     const valBirth = document.getElementById('setup-date').value;
@@ -226,13 +257,73 @@ function resetSystem() {
     }
 }
 
+function handleSessionTrigger() {
+    const input = document.getElementById('current-activity-input');
+    const btn = document.getElementById('session-main-btn');
+    const btnText = document.getElementById('session-btn-text');
+    const statusText = document.getElementById('session-status-text');
+    const timerDisplay = document.getElementById('session-timer-display');
+
+    if (!isSessionActive) {
+        const task = input.value.trim();
+        if (!task) { alert("Sajor, define tu foco de operación."); return; }
+
+        isSessionActive = true;
+        sessionStartTime = new Date();
+
+        btn.classList.replace('bg-cyan-500', 'bg-red-500');
+        btnText.innerText = "SELLAR ACCIÓN";
+        statusText.innerText = `OPERANDO EN: ${task.toUpperCase()}`;
+        statusText.classList.replace('text-white/30', 'text-cyan-400');
+        input.disabled = true;
+    } else {
+        const task = input.value;
+        const endTime = new Date();
+        const duration = Math.round((endTime - sessionStartTime) / 60000);
+        const startStr = sessionStartTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        const endStr = endTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+        saveSessionData(task, startStr, endStr, duration);
+
+        isSessionActive = false;
+        sessionStartTime = null;
+
+        btn.classList.replace('bg-red-500', 'bg-cyan-500');
+        btnText.innerText = "INICIAR SECUENCIA";
+        statusText.innerText = "Operación sellada en la Matrix.";
+        statusText.classList.replace('text-cyan-400', 'text-white/30');
+
+        input.disabled = false;
+        input.value = "";
+        timerDisplay.innerText = "00:00";
+        renderDayClock();
+    }
+}
+
+function saveSessionData(task, start, end, duration) {
+    const dayData = JSON.parse(localStorage.getItem(LS_KEY_DAY_DATA) || '{}');
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    if (!dayData[todayStr]) dayData[todayStr] = {};
+
+    // Store in the hour it started
+    const startHour = parseInt(start.split(':')[0]);
+    dayData[todayStr][startHour] = {
+        task: task,
+        time: `${start} - ${end}`,
+        duration: duration
+    };
+
+    localStorage.setItem(LS_KEY_DAY_DATA, JSON.stringify(dayData));
+}
+
 function renderDayClock() {
     const container = document.getElementById('dayClock');
     if (!container) return;
 
     const dayData = JSON.parse(localStorage.getItem(LS_KEY_DAY_DATA) || '{}');
     const todayStr = new Date().toISOString().split('T')[0];
-    const hours = dayData[todayStr] || {};
+    const sessions = dayData[todayStr] || {};
     const currentHour = new Date().getHours();
 
     if (!document.getElementById('hex-hour-0')) {
@@ -250,19 +341,20 @@ function renderDayClock() {
             hex.style.left = `${x}px`;
             hex.style.top = `${y}px`;
             hex.id = `hex-hour-${i}`;
-            hex.onclick = () => selectHour(i);
+            hex.onmouseover = () => showBitacora(i);
+            hex.onmouseout = () => hideBitacora();
             container.appendChild(hex);
         }
     }
 
     for (let i = 0; i < 24; i++) {
         const hex = document.getElementById(`hex-hour-${i}`);
-        const focus = hours[i];
+        const session = sessions[i];
 
-        hex.classList.remove('bg-cyan-500', 'bg-cyan-500/40', 'current-pulse', 'bg-white/5', 'border-white/5');
+        hex.classList.remove('bg-cyan-500', 'bg-cyan-500/40', 'pulse-grid', 'pulse-circular', 'bg-white/5', 'border-white/5');
         hex.style.boxShadow = 'none';
 
-        if (focus) {
+        if (session) {
             hex.classList.add('bg-cyan-500');
             hex.style.boxShadow = '0 0 15px #00f2ff';
         } else if (i < currentHour) {
@@ -272,36 +364,97 @@ function renderDayClock() {
         }
 
         if (i === currentHour) {
-            hex.classList.add('current-pulse');
+            hex.classList.add('pulse-circular');
         }
     }
 }
 
-function selectHour(h) {
+function showBitacora(h) {
     const dayData = JSON.parse(localStorage.getItem(LS_KEY_DAY_DATA) || '{}');
     const todayStr = new Date().toISOString().split('T')[0];
-    const data = (dayData[todayStr] && dayData[todayStr][h]);
+    const session = (dayData[todayStr] && dayData[todayStr][h]);
 
-    if (data) {
-        document.getElementById('current-activity-input').value = data.note;
+    const display = document.getElementById('bitacora-display');
+    const tField = document.getElementById('bitacora-task');
+    const timeField = document.getElementById('bitacora-time');
+    const durField = document.getElementById('bitacora-duration');
+
+    if (!display) return;
+
+    if (session) {
+        tField.innerText = session.task;
+        timeField.innerText = session.time;
+        durField.innerText = `${session.duration} min`;
+    } else {
+        tField.innerText = "Sin registro de comando";
+        timeField.innerText = `${h.toString().padStart(2, '0')}:00`;
+        durField.innerText = "0 min";
     }
+    display.style.opacity = "1";
 }
 
-function startDailyActivity() {
-    const activityInput = document.getElementById('current-activity-input');
-    const activity = activityInput.value;
-    if (!activity) { alert("Sajor, define la actividad de comando."); return; }
+function hideBitacora() {
+    const display = document.getElementById('bitacora-display');
+    if (display) display.style.opacity = "0";
+}
 
-    const currentHour = new Date().getHours();
-    const dayData = JSON.parse(localStorage.getItem(LS_KEY_DAY_DATA) || '{}');
-    const todayStr = new Date().toISOString().split('T')[0];
+// ANOMALY PROTOCOLS
+function openAnomalyTerminal(date) {
+    const terminal = document.getElementById('anomaly-terminal');
+    const titleInput = document.getElementById('anomaly-title');
+    const dateInput = document.getElementById('anomaly-date-input');
+    const deleteBtn = document.getElementById('delete-anomaly-btn');
 
-    if (!dayData[todayStr]) dayData[todayStr] = {};
-    dayData[todayStr][currentHour] = { type: 'action', note: activity };
+    selectedAnomalyDate = date || new Date().toISOString().split('T')[0];
+    const anomalies = JSON.parse(localStorage.getItem(LS_KEY_ANOMALIES) || '{}');
+    const existing = anomalies[selectedAnomalyDate];
 
-    localStorage.setItem(LS_KEY_DAY_DATA, JSON.stringify(dayData));
-    renderDayClock();
+    dateInput.value = selectedAnomalyDate;
+    titleInput.value = existing ? existing.title : '';
 
-    // Clear input after start
-    activityInput.value = '';
+    if (existing) deleteBtn.classList.remove('hidden');
+    else deleteBtn.classList.add('hidden');
+
+    terminal.classList.add('active');
+}
+
+function closeAnomalyTerminal() {
+    document.getElementById('anomaly-terminal').classList.remove('active');
+    selectedAnomalyDate = null;
+}
+
+function saveAnomaly(type) {
+    const title = document.getElementById('anomaly-title').value.trim();
+    const manualDate = document.getElementById('anomaly-date-input').value;
+
+    if (!manualDate) { alert("Sajor, la Matrix requiere una coordenada temporal (fecha)."); return; }
+    if (!title) { alert("Sajor, la anomalía requiere una designación (nombre)."); return; }
+
+    const anomalies = JSON.parse(localStorage.getItem(LS_KEY_ANOMALIES) || '{}');
+    anomalies[manualDate] = {
+        date: manualDate,
+        title: title,
+        type: type
+    };
+
+    localStorage.setItem(LS_KEY_ANOMALIES, JSON.stringify(anomalies));
+    closeAnomalyTerminal();
+
+    // Auto-detect current view mode to refresh
+    const label = document.getElementById('stat-label').innerText;
+    const mode = label.includes('Año') ? 'years' : (label.includes('Mes') ? 'months' : 'weeks');
+    renderLifeGrid(mode);
+}
+
+function deleteAnomaly() {
+    const manualDate = document.getElementById('anomaly-date-input').value;
+    if (confirm("¿Abortar este registro temporal?")) {
+        const anomalies = JSON.parse(localStorage.getItem(LS_KEY_ANOMALIES) || '{}');
+        delete anomalies[manualDate];
+        localStorage.setItem(LS_KEY_ANOMALIES, JSON.stringify(anomalies));
+        closeAnomalyTerminal();
+        const label = document.getElementById('stat-label').innerText;
+        const mode = label.includes('Año') ? 'years' : (label.includes('Mes') ? 'months' : 'weeks');
+        renderLifeGrid(mode);
+    }
 }
