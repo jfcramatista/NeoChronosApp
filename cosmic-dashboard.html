@@ -408,27 +408,44 @@
                 </div>
             </section>
 
-            <!-- Tab: Bitácora de Anomalías (Hitos) -->
-            <section id="tab-hitos" class="tab-content flex-col p-12 w-full h-full items-center">
-                <div
-                    class="max-w-md w-full glass p-10 rounded-3xl border-dashed border-2 border-white/10 flex flex-col items-center text-center">
-                    <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 theme-text-dim" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-                                d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+
+            <!-- Tab: Bitácora de Sesiones -->
+            <section id="tab-hitos" class="tab-content flex-col p-8 w-full h-full overflow-y-auto">
+                <div class="max-w-4xl w-full mx-auto space-y-6">
+                    <!-- Header -->
+                    <div class="text-center mb-8">
+                        <h1 class="text-2xl font-black uppercase tracking-[0.4em] mb-2" style="color: var(--accent);">
+                            Bitácora de Sesiones</h1>
+                        <p class="text-[9px] uppercase tracking-[0.3em] theme-text-dim">Registro completo de tus
+                            operaciones temporales</p>
                     </div>
-                    <h2 class="text-lg font-light tracking-[0.3em] theme-text-main uppercase mb-4">Registro de Hitos
-                    </h2>
-                    <p class="text-[10px] theme-text-dim tracking-widest leading-relaxed mb-8">Captura una anomalía en
-                        el tiempo. Convierte un momento en una memoria permanente dentro de tu Macro-Matrix.</p>
-                    <button onclick="openAnomalyTerminal()"
-                        class="w-full py-5 bg-white/5 border border-white/10 text-[10px] uppercase font-bold tracking-[0.4em] rounded-xl hover:bg-accent/20 hover:border-accent transition-all theme-text-main">
-                        + Registrar Nueva Anomalía
-                    </button>
+
+                    <!-- Session Log Container -->
+                    <div id="session-log-container" class="space-y-6">
+                        <!-- Sessions will be rendered here grouped by date -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="session-log-empty"
+                        class="glass p-12 rounded-2xl border border-white/10 text-center hidden">
+                        <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 theme-text-dim" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-light tracking-[0.3em] theme-text-main uppercase mb-3">Sin Registros
+                        </h2>
+                        <p class="text-[10px] theme-text-dim tracking-widest leading-relaxed">
+                            Aún no has completado ninguna sesión.<br>Ve a «Protocolo de Acción» para iniciar tu primera
+                            misión.
+                        </p>
+                    </div>
                 </div>
             </section>
+
+
 
 
             <section id="tab-settings" class="tab-content flex-col items-center justify-center w-full h-full p-12">

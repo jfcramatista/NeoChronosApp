@@ -141,6 +141,11 @@ function switchTab(id) {
         switchTab('life');
         renderLifeGrid('days');
     }
+
+    // Logic for Session Log
+    if (id === 'hitos') {
+        renderSessionLog();
+    }
 }
 
 function renderLifeGrid(mode) {
@@ -656,32 +661,32 @@ function startHexProgress() {
 function createHourHexagon(hourIndex) {
     const grid = document.getElementById('hex-progress-grid');
     if (!grid) return;
-    
+
     let hourContainer = document.getElementById('hex-hour-main');
-    
+
     if (!hourContainer) {
         hourContainer = document.createElement('div');
         hourContainer.className = 'hex-hour-container';
         hourContainer.id = 'hex-hour-main';
-        
+
         for (let i = 1; i <= 5; i++) {
             const layer = document.createElement('div');
             layer.className = `hex-layer hex-layer-${i}`;
             layer.id = `hex-layer-${i}`;
             hourContainer.appendChild(layer);
         }
-        
+
         const minuteGrid = document.createElement('div');
         minuteGrid.className = 'hex-minute-grid';
         minuteGrid.id = 'minute-grid-main';
-        
+
         const rowPattern = [6, 8, 9, 10, 10, 9, 8];
         let hexIndex = 0;
-        
+
         rowPattern.forEach((hexCount, rowIndex) => {
             const row = document.createElement('div');
             row.className = 'hex-row';
-            
+
             for (let i = 0; i < hexCount; i++) {
                 const miniHex = document.createElement('div');
                 miniHex.className = 'hex-minute';
@@ -690,15 +695,15 @@ function createHourHexagon(hourIndex) {
                 row.appendChild(miniHex);
                 hexIndex++;
             }
-            
+
             minuteGrid.appendChild(row);
         });
-        
+
         const label = document.createElement('div');
         label.className = 'hex-hour-label';
         label.id = 'hex-hour-label';
         label.innerText = 'Hora 1';
-        
+
         hourContainer.appendChild(minuteGrid);
         hourContainer.appendChild(label);
         grid.appendChild(hourContainer);
@@ -713,7 +718,7 @@ function updateHexProgress(totalMs) {
 
     // Create new hour hexagon if needed
     if (!document.getElementById('hex-hour-main')) { createHourHexagon(0); }
-    
+
     // Illuminate layers based on completed hours
     const totalHours = Math.floor(totalMinutes / 60);
     for (let i = 1; i <= 5; i++) {
@@ -726,7 +731,7 @@ function updateHexProgress(totalMs) {
             }
         }
     }
-    
+
     // Update hour label
     const label = document.getElementById('hex-hour-label');
     if (label) {
@@ -765,4 +770,176 @@ function stopHexProgress() {
         clearInterval(hexProgressInterval);
         hexProgressInterval = null;
     }
+}
+
+// SESSION LOG RENDERING (Book Format)
+function renderSessionLog() {
+    const dayData = JSON.parse(localStorage.getItem(LS_KEY_DAY_DATA) || '{}');
+    const container = document.getElementById('session-log-container');
+    const emptyState = document.getElementById('session-log-empty');
+
+    if (!container) return;
+
+    // Get all dates with sessions and sort chronologically (newest first)
+    const dates = Object.keys(dayData).sort((a, b) => new Date(b) - new Date(a));
+
+    if (dates.length === 0) {
+        container.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+    }
+
+    if (emptyState) emptyState.classList.add('hidden');
+    container.innerHTML = '';
+
+    // Render each date as a "book page"
+    dates.forEach(dateStr => {
+        const sessions = dayData[dateStr];
+        const date = new Date(dateStr);
+
+        // Create page container
+        const page = document.createElement('div');
+        page.className = 'session-log-page glass animate-fade-in';
+
+        // Page header (date)
+        const pageHeader = document.createElement('div');
+        pageHeader.className = 'session-page-header';
+
+        const dateTitle = document.createElement('h3');
+        dateTitle.className = 'session-page-date';
+        dateTitle.innerHTML = `
+            <span class="date-day">${date.toLocaleDateString('es-ES', { weekday: 'long' })}</span>
+            <span class="date-full">${date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+        `;
+
+        pageHeader.appendChild(dateTitle);
+        page.appendChild(pageHeader);
+
+        // Page content (sessions)
+        const pageContent = document.createElement('div');
+        pageContent.className = 'session-page-content';
+
+        // Get all sessions for this date and sort by hour
+        const sessionEntries = Object.entries(sessions).sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+
+        // Calculate total time for the day
+        const totalMinutes = sessionEntries.reduce((sum, [_, session]) => sum + (session.duration || 0), 0);
+
+        sessionEntries.forEach(([hour, session]) => {
+            const entry = document.createElement('div');
+            entry.className = 'session-entry';
+
+            // Time indicator
+            const timeIndicator = document.createElement('div');
+            timeIndicator.className = 'session-time-indicator';
+            timeIndicator.innerHTML = `
+                <div class="session-time-dot"></div>
+                <div class="session-time-text">${session.time || `${hour.padStart(2, '0')}:00`}</div>
+            `;
+
+            // Session details
+            const details = document.createElement('div');
+            details.className = 'session-details';
+
+            // Extract category from task if present
+            let taskName = session.task;
+            let category = '';
+            const categoryMatch = session.task.match(/^\[(.+?)\]\s*(.+)$/);
+            if (categoryMatch) {
+                category = categoryMatch[1];
+                taskName = categoryMatch[2];
+            }
+
+            // Task name
+            const taskEl = document.createElement('div');
+            taskEl.className = 'session-task-name';
+            taskEl.textContent = taskName;
+
+            // Category badge (if exists)
+            if (category) {
+                const categoryBadge = document.createElement('span');
+                categoryBadge.className = 'session-category-badge';
+                categoryBadge.textContent = category;
+                taskEl.prepend(categoryBadge);
+            }
+
+            // Metadata row (pillar, energy, duration)
+            const meta = document.createElement('div');
+            meta.className = 'session-meta';
+
+            const pillarNames = {
+                'pillar-op': 'Operación',
+                'pillar-con': 'Conexión',
+                'pillar-vit': 'Vitalidad',
+                'pillar-chaos': 'Espíritu'
+            };
+
+            const pillarColors = {
+                'pillar-op': '#00f2ff',
+                'pillar-con': '#ff007a',
+                'pillar-vit': '#39ff14',
+                'pillar-chaos': '#f0f000'
+            };
+
+            // Pillar indicator
+            const pillarEl = document.createElement('div');
+            pillarEl.className = 'session-meta-item session-pillar';
+            const pillarColor = pillarColors[session.pillar] || '#666';
+            pillarEl.innerHTML = `
+                <span class="meta-icon" style="background: ${pillarColor}; box-shadow: 0 0 10px ${pillarColor}33;"></span>
+                <span class="meta-label">${pillarNames[session.pillar] || 'General'}</span>
+            `;
+
+            // Energy indicator
+            const energyEl = document.createElement('div');
+            energyEl.className = 'session-meta-item session-energy';
+            energyEl.innerHTML = `
+                <span class="meta-emoji">${ENERGY_ICONS[session.energy] || '⚡'}</span>
+                <span class="meta-label">${session.energy === 'low' ? 'Baja' : session.energy === 'fluid' ? 'Fluido' : 'Carga'}</span>
+            `;
+
+            // Duration indicator
+            const durationEl = document.createElement('div');
+            durationEl.className = 'session-meta-item session-duration';
+            durationEl.innerHTML = `
+                <span class="meta-icon">⏱️</span>
+                <span class="meta-label">${session.duration || 0} min</span>
+            `;
+
+            meta.appendChild(pillarEl);
+            meta.appendChild(energyEl);
+            meta.appendChild(durationEl);
+
+            details.appendChild(taskEl);
+            details.appendChild(meta);
+
+            entry.appendChild(timeIndicator);
+            entry.appendChild(details);
+
+            pageContent.appendChild(entry);
+        });
+
+        // Page footer (summary stats)
+        const pageFooter = document.createElement('div');
+        pageFooter.className = 'session-page-footer';
+        pageFooter.innerHTML = `
+            <div class="page-stat">
+                <span class="stat-value">${sessionEntries.length}</span>
+                <span class="stat-label">Sesiones</span>
+            </div>
+            <div class="page-stat">
+                <span class="stat-value">${totalMinutes}</span>
+                <span class="stat-label">Minutos</span>
+            </div>
+            <div class="page-stat">
+                <span class="stat-value">${(totalMinutes / 60).toFixed(1)}</span>
+                <span class="stat-label">Horas</span>
+            </div>
+        `;
+
+        page.appendChild(pageContent);
+        page.appendChild(pageFooter);
+
+        container.appendChild(page);
+    });
 }

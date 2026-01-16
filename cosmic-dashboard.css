@@ -767,3 +767,298 @@ body {
     color: var(--accent);
     font-weight: bold;
 }
+
+/* SESSION LOG - BOOK STYLE */
+.session-log-page {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.session-log-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.session-log-page:hover {
+    border-color: var(--accent);
+    box-shadow: 0 8px 32px rgba(0, 242, 255, 0.1);
+}
+
+/* Page Header */
+.session-page-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+}
+
+.session-page-date {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+}
+
+.date-day {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.date-full {
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--text-main);
+    letter-spacing: 0.1em;
+    text-transform: capitalize;
+}
+
+/* Page Content */
+.session-page-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 24px;
+    position: relative;
+}
+
+/* Timeline connector */
+.session-page-content::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 24px;
+    bottom: 24px;
+    width: 1px;
+    background: linear-gradient(to bottom,
+            transparent,
+            var(--border) 20%,
+            var(--border) 80%,
+            transparent);
+}
+
+/* Session Entry */
+.session-entry {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    position: relative;
+    padding-left: 0;
+    transition: all 0.2s ease;
+}
+
+.session-entry:hover {
+    transform: translateX(4px);
+}
+
+/* Time Indicator */
+.session-time-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 80px;
+    position: relative;
+    z-index: 2;
+}
+
+.session-time-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow:
+        0 0 15px var(--accent-glow),
+        inset 0 0 8px rgba(255, 255, 255, 0.3);
+    border: 2px solid var(--bg-main);
+    transition: all 0.3s ease;
+}
+
+.session-entry:hover .session-time-dot {
+    transform: scale(1.2);
+    box-shadow:
+        0 0 25px var(--accent-glow),
+        inset 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.session-time-text {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 0.1em;
+}
+
+/* Session Details */
+.session-details {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.session-entry:hover .session-details {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(0, 242, 255, 0.2);
+}
+
+/* Task Name */
+.session-task-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-main);
+    line-height: 1.6;
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Category Badge */
+.session-category-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    background: rgba(0, 242, 255, 0.1);
+    border: 1px solid rgba(0, 242, 255, 0.3);
+    border-radius: 12px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-right: 8px;
+}
+
+/* Session Metadata */
+.session-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.session-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: var(--text-dim);
+}
+
+.meta-icon {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.meta-emoji {
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
+}
+
+.meta-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    color: var(--text-dim);
+}
+
+/* Page Footer */
+.session-page-footer {
+    display: flex;
+    gap: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    justify-content: flex-end;
+}
+
+.page-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 900;
+    color: var(--accent);
+    text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.stat-label {
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    font-weight: 600;
+}
+
+/* Page turning animation */
+@keyframes pageFlip {
+    0% {
+        opacity: 0;
+        transform: perspective(1000px) rotateY(-10deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: perspective(1000px) rotateY(0deg);
+    }
+}
+
+.session-log-page {
+    animation: pageFlip 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.session-log-page:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.session-log-page:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.session-log-page:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+/* Paper texture effect (subtle) */
+.session-log-page::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(0deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.01) 2px,
+            rgba(255, 255, 255, 0.01) 4px);
+    pointer-events: none;
+    opacity: 0.3;
+    border-radius: 16px;
+}
