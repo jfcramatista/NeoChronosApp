@@ -656,38 +656,53 @@ function startHexProgress() {
 function createHourHexagon(hourIndex) {
     const grid = document.getElementById('hex-progress-grid');
     if (!grid) return;
-
-    // Create large hexagon container
-    const hourContainer = document.createElement('div');
-    hourContainer.className = 'hex-hour-container';
-    hourContainer.id = `hex-hour-${hourIndex}`;
-
-    // Background hexagon shape
-    const hourBg = document.createElement('div');
-    hourBg.className = 'hex-hour-bg';
-
-    // Grid for 60 mini hexagons (10x6)
-    const minuteGrid = document.createElement('div');
-    minuteGrid.className = 'hex-minute-grid';
-    minuteGrid.id = `minute-grid-${hourIndex}`;
-
-    // Create 60 minute hexagons
-    for (let i = 0; i < 60; i++) {
-        const miniHex = document.createElement('div');
-        miniHex.className = 'hex-minute';
-        miniHex.id = `minute-${hourIndex}-${i}`;
-        minuteGrid.appendChild(miniHex);
+    
+    let hourContainer = document.getElementById('hex-hour-main');
+    
+    if (!hourContainer) {
+        hourContainer = document.createElement('div');
+        hourContainer.className = 'hex-hour-container';
+        hourContainer.id = 'hex-hour-main';
+        
+        for (let i = 1; i <= 5; i++) {
+            const layer = document.createElement('div');
+            layer.className = `hex-layer hex-layer-${i}`;
+            layer.id = `hex-layer-${i}`;
+            hourContainer.appendChild(layer);
+        }
+        
+        const minuteGrid = document.createElement('div');
+        minuteGrid.className = 'hex-minute-grid';
+        minuteGrid.id = 'minute-grid-main';
+        
+        const rowPattern = [6, 8, 9, 10, 10, 9, 8];
+        let hexIndex = 0;
+        
+        rowPattern.forEach((hexCount, rowIndex) => {
+            const row = document.createElement('div');
+            row.className = 'hex-row';
+            
+            for (let i = 0; i < hexCount; i++) {
+                const miniHex = document.createElement('div');
+                miniHex.className = 'hex-minute';
+                miniHex.id = `minute-${hexIndex}`;
+                miniHex.setAttribute('data-minute', hexIndex);
+                row.appendChild(miniHex);
+                hexIndex++;
+            }
+            
+            minuteGrid.appendChild(row);
+        });
+        
+        const label = document.createElement('div');
+        label.className = 'hex-hour-label';
+        label.id = 'hex-hour-label';
+        label.innerText = 'Hora 1';
+        
+        hourContainer.appendChild(minuteGrid);
+        hourContainer.appendChild(label);
+        grid.appendChild(hourContainer);
     }
-
-    // Label
-    const label = document.createElement('div');
-    label.className = 'hex-hour-label';
-    label.innerText = `Hora ${hourIndex + 1}`;
-
-    hourContainer.appendChild(hourBg);
-    hourContainer.appendChild(minuteGrid);
-    hourContainer.appendChild(label);
-    grid.appendChild(hourContainer);
 }
 
 function updateHexProgress(totalMs) {
@@ -697,14 +712,29 @@ function updateHexProgress(totalMs) {
     const minuteInCurrentHour = totalMinutes % 60;
 
     // Create new hour hexagon if needed
-    if (currentHourIndex > currentHexIndex) {
-        currentHexIndex = currentHourIndex;
-        createHourHexagon(currentHexIndex);
+    if (!document.getElementById('hex-hour-main')) { createHourHexagon(0); }
+    
+    // Illuminate layers based on completed hours
+    const totalHours = Math.floor(totalMinutes / 60);
+    for (let i = 1; i <= 5; i++) {
+        const layer = document.getElementById(`hex-layer-${i}`);
+        if (layer) {
+            if (i <= totalHours) {
+                layer.classList.add('illuminated');
+            } else {
+                layer.classList.remove('illuminated');
+            }
+        }
     }
-
+    
+    // Update hour label
+    const label = document.getElementById('hex-hour-label');
+    if (label) {
+        label.innerText = `Hora ${totalHours + 1} - ${minuteInCurrentHour}/60`;
+    }
     // Update mini hexagons in current hour
     for (let i = 0; i < 60; i++) {
-        const miniHex = document.getElementById(`minute-${currentHexIndex}-${i}`);
+        const miniHex = document.getElementById(`minute-${i}`);
         if (!miniHex) continue;
 
         if (i < minuteInCurrentHour) {

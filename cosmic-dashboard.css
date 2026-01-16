@@ -636,20 +636,81 @@ body {
     clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
 }
 
+/* Concentric hexagonal layers */
+.hex-layer {
+    position: absolute;
+    border: 2px solid rgba(0, 242, 255, 0.1);
+    clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
+    background: transparent;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hex-layer.illuminated {
+    background: radial-gradient(circle, rgba(0, 242, 255, 0.15), transparent);
+    border: 2px solid rgba(0, 242, 255, 0.6);
+    box-shadow:
+        inset 0 0 20px rgba(0, 242, 255, 0.3),
+        0 0 30px rgba(0, 242, 255, 0.4);
+    animation: layerGlow 3s ease-in-out infinite;
+}
+
+@keyframes layerGlow {
+
+    0%,
+    100% {
+        opacity: 1;
+        filter: brightness(1);
+    }
+
+    50% {
+        opacity: 0.85;
+        filter: brightness(1.2);
+    }
+}
+
+/* Layer sizes - each layer progressively larger */
+.hex-layer-1 {
+    inset: 10%;
+}
+
+.hex-layer-2 {
+    inset: 5%;
+}
+
+.hex-layer-3 {
+    inset: 0%;
+}
+
+.hex-layer-4 {
+    inset: -5%;
+}
+
+.hex-layer-5 {
+    inset: -10%;
+}
+
 .hex-minute-grid {
     position: relative;
     z-index: 10;
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 3px;
-    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 20px;
     width: 100%;
     height: 100%;
 }
 
+.hex-row {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+}
+
 .hex-minute {
-    width: 100%;
-    aspect-ratio: 1;
+    width: 28px;
+    height: 28px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.05);
     clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
