@@ -505,11 +505,12 @@
             </section>
         </main>
     </div>
-    <div id="onboarding-overlay" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center hidden">
-        <h1 class="text-4xl font-thin tracking-[0.5em] mb-4 text-cyan-400 animate-pulse">NEO-CHRONOS</h1>
-        <button onclick="document.getElementById('onboarding-overlay').style.display='none'; switchTab('life');"
-            class="px-12 py-4 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-black rounded text-[10px] uppercase font-bold tracking-[0.4em] transition-all">COMENZAR
-            SECUENCIA</button>
+    <div id="onboarding-overlay" class="fixed inset-0 z-50">
+        <h1 class="welcome-title">NEO-CHRONOS</h1>
+        <button onclick="startSystemSequence()"
+            class="px-12 py-4 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-black rounded text-[10px] uppercase font-bold tracking-[0.4em] transition-all">
+            COMENZAR SECUENCIA
+        </button>
     </div>
     <script src="cosmic-dashboard.js"></script>
     <!-- Temporal Anomaly Terminal -->

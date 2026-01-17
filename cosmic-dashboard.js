@@ -26,13 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setLifeTheme(savedTheme);
 
+    const overlay = document.getElementById('onboarding-overlay');
     if (!birth) {
-        const overlay = document.getElementById('onboarding-overlay');
         if (overlay) {
-            overlay.classList.remove('hidden');
             overlay.style.display = 'flex';
         }
     } else {
+        if (overlay) overlay.remove(); // Eliminar de raíz si ya hay datos
         document.getElementById('setup-date').value = birth;
         document.getElementById('setup-expectancy').value = totalYears;
         switchTab('life');
@@ -41,6 +41,19 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateSystemClock, 1000);
     updateSystemClock();
 });
+
+function startSystemSequence() {
+    const overlay = document.getElementById('onboarding-overlay');
+    if (overlay) {
+        overlay.classList.add('fade-out');
+        setTimeout(() => {
+            overlay.remove(); // Eliminar del DOM para liberar espacio
+            switchTab('life');
+        }, 800);
+    } else {
+        switchTab('life');
+    }
+}
 
 function setLifeTheme(themeId) {
     document.documentElement.setAttribute('data-theme', themeId);
