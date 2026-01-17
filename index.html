@@ -28,15 +28,24 @@
             }
         }
     </script>
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="cosmic-dashboard.css">
 </head>
 
 <body class="h-screen w-screen flex flex-col font-sans">
     <header class="h-14 glass border-b border-white/5 flex items-center justify-between px-6 z-20 relative">
         <div class="flex items-center gap-3">
-            <div class="w-2 h-2 bg-accent rounded-full shadow-[0_0_10px_var(--accent)]"></div>
-            <h1 class="text-xs uppercase tracking-[0.4em] font-semibold theme-text-main">Neo-Chronos</h1>
-            <span class="text-[9px] uppercase tracking-widest theme-text-dim">System v3.0</span>
+            <div class="status-indicator bg-accent"></div>
+            <h1 class="text-xs uppercase tracking-[0.4em] font-semibold theme-text-main">Neo-Chronos Dashboard</h1>
+            <span
+                class="text-[9px] uppercase tracking-widest theme-text-dim px-2 py-0.5 border border-white/10 rounded">SYSTEM
+                ACTIVE</span>
+        </div>
+        <div class="flex items-center gap-6">
+            <div id="connection-status" class="flex items-center gap-2">
+                <span class="text-[8px] uppercase tracking-widest text-accent font-bold">Local Neural Link</span>
+                <div class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></div>
+            </div>
         </div>
     </header>
     <div class="flex-1 flex overflow-hidden">
@@ -210,48 +219,58 @@
                         </div>
 
                         <!-- Frequency Mirror -->
-                        <div class="mirror-container w-full max-w-md mt-8">
-                            <h4 class="text-[9px] uppercase tracking-[0.4em] theme-text-dim mb-8 text-center italic">
-                                Espejo de Frecuencias</h4>
+                        <div class="mirror-container w-full max-w-md mt-12 glass relative p-8 rounded-2xl">
+                            <div class="cyber-corner corner-tl"></div>
+                            <div class="cyber-corner corner-tr"></div>
+                            <div class="cyber-corner corner-bl"></div>
+                            <div class="cyber-corner corner-br"></div>
+
+                            <h4
+                                class="text-[10px] uppercase tracking-[0.4em] theme-text-dim mb-8 text-center font-bold">
+                                Espejo de Frecuencias Operativas</h4>
                             <div class="space-y-6">
                                 <div class="space-y-2">
-                                    <div class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
-                                        <span style="color: var(--color-focus)">Operación</span>
+                                    <div class="flex justify-between text-[8px] uppercase tracking-widest font-bold">
+                                        <span style="color: var(--color-focus)">Operación (Focus)</span>
                                         <span id="mirror-val-op" class="theme-text-main">0%</span>
                                     </div>
                                     <div class="frequency-bar-bg">
                                         <div id="mirror-fill-op" class="frequency-bar-fill"
-                                            style="width:0%; background: var(--color-focus);"></div>
+                                            style="width:0%; background: var(--color-focus); box-shadow: 0 0 10px var(--color-focus);">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="space-y-2">
-                                    <div class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
-                                        <span style="color: var(--color-connection)">Conexión</span>
+                                    <div class="flex justify-between text-[8px] uppercase tracking-widest font-bold">
+                                        <span style="color: var(--color-connection)">Conexión (Social)</span>
                                         <span id="mirror-val-con" class="theme-text-main">0%</span>
                                     </div>
                                     <div class="frequency-bar-bg">
                                         <div id="mirror-fill-con" class="frequency-bar-fill"
-                                            style="width:0%; background: var(--color-connection);"></div>
+                                            style="width:0%; background: var(--color-connection); box-shadow: 0 0 10px var(--color-connection);">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="space-y-2">
-                                    <div class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
-                                        <span style="color: var(--color-vitality)">Vitalidad</span>
+                                    <div class="flex justify-between text-[8px] uppercase tracking-widest font-bold">
+                                        <span style="color: var(--color-vitality)">Vitalidad (BIO)</span>
                                         <span id="mirror-val-vit" class="theme-text-main">0%</span>
                                     </div>
                                     <div class="frequency-bar-bg">
                                         <div id="mirror-fill-vit" class="frequency-bar-fill"
-                                            style="width:0%; background: var(--color-vitality);"></div>
+                                            style="width:0%; background: var(--color-vitality); box-shadow: 0 0 10px var(--color-vitality);">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="space-y-2">
-                                    <div class="flex justify-between text-[7px] uppercase tracking-widest font-bold">
-                                        <span style="color: var(--color-spirit)">Espíritu</span>
+                                    <div class="flex justify-between text-[8px] uppercase tracking-widest font-bold">
+                                        <span style="color: var(--color-spirit)">Espíritu (Meta)</span>
                                         <span id="mirror-val-chaos" class="theme-text-main">0%</span>
                                     </div>
                                     <div class="frequency-bar-bg">
                                         <div id="mirror-fill-chaos" class="frequency-bar-fill"
-                                            style="width:0%; background: var(--color-spirit);"></div>
+                                            style="width:0%; background: var(--color-spirit); box-shadow: 0 0 10px var(--color-spirit);">
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -13,10 +13,10 @@ let hexProgressInterval = null;
 let currentHexIndex = 0;
 const ENERGY_ICONS = { low: '🧊', fluid: '⚡', overload: '🔥' };
 const PILLAR_COLORS = {
-    'pillar-op': '#c4a7e7',    // Violeta (Foco/Sabiduría)
-    'pillar-con': '#ebbcba',   // Rose Gold (Humanidad)
-    'pillar-vit': '#31748f',   // Pine Blue (Vitalidad Serena)
-    'pillar-chaos': '#f6c177'  // Amber Gold (Espíritu/Caos)
+    'pillar-op': '#00f2ff',    // Neon Cyan (Operación)
+    'pillar-con': '#ff007a',   // Neon Magenta (Conexión)
+    'pillar-vit': '#39ff14',   // Neon Green (Vitalidad)
+    'pillar-chaos': '#f0f000'  // Neon Yellow (Espíritu)
 };
 const LS_KEY_THEME = 'neo-chronos-theme';
 
@@ -64,10 +64,13 @@ function updateSystemClock() {
         const currentMinutes = now.getMinutes();
         const currentSeconds = now.getSeconds();
 
-        // Calculate Hour Progress
-        const percent = Math.floor(((currentMinutes * 60 + currentSeconds) / 3600) * 100);
-        if (progressFill) progressFill.style.height = `${percent}%`;
-        if (progressPercent) progressPercent.innerText = `${percent}%`;
+        // Calculate Daily Progress (0-24h)
+        const totalDaySeconds = 24 * 3600;
+        const elapsedSeconds = (currentHour * 3600) + (currentMinutes * 60) + currentSeconds;
+        const dayPercent = Math.floor((elapsedSeconds / totalDaySeconds) * 100);
+
+        if (progressFill) progressFill.style.height = `${dayPercent}%`;
+        if (progressPercent) progressPercent.innerText = `${dayPercent}%`;
 
         // Session Timer Update
         if (isSessionActive && sessionStartTime && sessionTimer) {
@@ -941,5 +944,14 @@ function renderSessionLog() {
         page.appendChild(pageFooter);
 
         container.appendChild(page);
+    });
+}
+
+// Registro del Service Worker para PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Sajor, enlace neural (PWA) establecido con éxito.', reg))
+            .catch(err => console.log('Error en la conexión del enlace:', err));
     });
 }
