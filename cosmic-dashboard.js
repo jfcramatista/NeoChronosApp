@@ -305,13 +305,13 @@ function renderLifeGrid(mode) {
         }
 
         if (i < lived) {
-            statusClass = 'past bg-cyan-500';
-            if (anomaly) statusClass = `anomaly-${anomaly.type}`;
+            statusClass = 'past';
+            if (anomaly) statusClass += ` anomaly-${anomaly.type}`;
         } else if (i === lived) {
-            statusClass = 'present bg-white pulse-grid';
+            statusClass = 'present';
         } else {
-            statusClass = 'future bg-white/5 border border-white/5 cursor-pointer';
-            if (anomaly) statusClass = `anomaly-${anomaly.type}`;
+            statusClass = 'future';
+            if (anomaly) statusClass += ` anomaly-${anomaly.type}`;
         }
 
         // Add Decade Marker if in years mode at the start of each decade (row)
