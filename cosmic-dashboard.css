@@ -157,10 +157,11 @@ body::after {
 
 .stat-card-critical {
     border-bottom: 2px solid var(--accent) !important;
-    background: linear-gradient(to bottom, rgba(0, 242, 255, 0.05), transparent) !important;
-    transform: scale(1.05);
+    background: linear-gradient(to bottom, rgba(0, 242, 255, 0.1), transparent) !important;
+    transform: scale(1.1);
     z-index: 10;
-    box-shadow: 0 0 20px rgba(0, 242, 255, 0.15);
+    box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
+    margin-bottom: 1rem;
 }
 
 .stat-card-critical .stat-value {
@@ -218,22 +219,23 @@ body::after {
     animation: scanningLine 1s ease-in-out;
 }
 
-/* Grid Temporal Zonificado */
+/* Grid Temporal Zonificado (V3.3.2) */
 .grid-node.past {
-    opacity: 0.2;
-    filter: grayscale(1);
+    opacity: 0.55 !important;
 }
 
 .grid-node.present {
-    box-shadow: 0 0 15px var(--accent);
-    border: 1px solid white;
-    z-index: 5;
-    animation: hexPulseFast 2s infinite;
+    background-color: #fff !important;
+    box-shadow: 0 0 25px #fff, 0 0 50px var(--accent-glow) !important;
+    border: 2px solid #fff !important;
+    z-index: 20;
+    animation: hexPulseFast 1s infinite;
+    transform: scale(1.25);
 }
 
 .grid-node.future {
-    background: var(--bg-hex-empty);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    opacity: 0.15;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Scrollbar Personalizada */
@@ -499,7 +501,7 @@ body::after {
 }
 
 .hex-shape {
-    clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
 
 .clock-dial {

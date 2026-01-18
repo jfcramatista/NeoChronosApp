@@ -146,21 +146,10 @@
                     <!-- Scanning Visual Overlay -->
                     <div id="scan-overlay" class="scanning-line"></div>
 
-                    <div class="flex flex-wrap justify-center gap-4 mb-4 mt-6 w-full px-4">
+                    <div class="flex flex-col items-center gap-6 mb-8 mt-8 w-full px-4">
+                        <!-- Horizonte de Posibilidad (El Centro de la Existencia) -->
                         <div
-                            class="stat-card-premium glass p-4 rounded-xl border border-white/5 flex flex-col items-center w-32">
-                            <span class="text-[8px] uppercase tracking-widest text-white/40 mb-1">Densidad Vital</span>
-                            <span id="stat-percent" class="text-xl font-bold stat-value text-cyan-400">0%</span>
-                        </div>
-                        <div
-                            class="stat-card-premium glass p-4 rounded-xl border border-white/5 flex flex-col items-center w-32">
-                            <span id="stat-label" class="text-[8px] uppercase tracking-widest text-white/40 mb-1">Vida
-                                Recorrida</span>
-                            <span id="stat-lived" class="text-xl font-bold stat-value">0</span>
-                        </div>
-                        <!-- Potencial Restante: Card Crítica -->
-                        <div
-                            class="stat-card-premium stat-card-critical glass p-5 rounded-2xl border border-cyan-500/30 flex flex-col items-center w-40 relative">
+                            class="stat-card-premium stat-card-critical glass p-6 rounded-2xl border border-cyan-500/30 flex flex-col items-center w-full max-w-[240px] relative shadow-2xl shadow-cyan-500/20">
                             <div class="absolute top-2 right-2">
                                 <span class="relative flex h-2 w-2">
                                     <span
@@ -168,26 +157,45 @@
                                     <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
                                 </span>
                             </div>
-                            <span class="text-[9px] uppercase tracking-[0.2em] text-cyan-400 font-bold mb-1">PROYECCIÓN
-                                RESTANTE</span>
-                            <span id="stat-left" class="text-3xl font-black stat-value">0</span>
-                            <span class="text-[7px] text-cyan-300/50 mt-1 uppercase tracking-widest">Años de
-                                Acción</span>
+                            <span class="text-[9px] uppercase tracking-[0.25em] text-cyan-400 font-bold mb-1">HORIZONTE
+                                DE POSIBILIDAD</span>
+                            <span id="stat-left" class="text-4xl font-black stat-value">0</span>
+                            <span class="text-[7px] text-cyan-300/50 mt-1 uppercase tracking-[0.3em]">Años de Acción
+                                Real</span>
                         </div>
+
+                        <!-- Métricas de Conciencia -->
+                        <div class="flex justify-center gap-4 w-full">
+                            <div
+                                class="stat-card-premium glass p-4 rounded-xl border border-white/5 flex flex-col items-center w-36">
+                                <span class="text-[8px] uppercase tracking-widest text-white/40 mb-1">Conciencia del
+                                    Camino</span>
+                                <span id="stat-percent" class="text-xl font-bold stat-value text-cyan-400">0%</span>
+                            </div>
+                            <div
+                                class="stat-card-premium glass p-4 rounded-xl border border-white/5 flex flex-col items-center w-36">
+                                <span id="stat-label"
+                                    class="text-[8px] uppercase tracking-widest text-white/40 mb-1">Legado
+                                    Acumulado</span>
+                                <span id="stat-lived" class="text-xl font-bold stat-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View Selector (Persistent) -->
+                    <div class="flex gap-2 mb-8 glass p-1 rounded-full border border-white/5 bg-black/20 self-center">
+                        <button id="view-years" onclick="renderLifeGrid('years')"
+                            class="view-btn px-6 py-2 rounded-full text-[10px] uppercase font-bold tracking-widest transition-all">Años</button>
+                        <button id="view-months" onclick="renderLifeGrid('months')"
+                            class="view-btn px-6 py-2 rounded-full text-[10px] uppercase font-bold tracking-widest transition-all">Meses</button>
+                        <button id="view-weeks" onclick="renderLifeGrid('weeks')"
+                            class="view-btn px-6 py-2 rounded-full text-[10px] uppercase font-bold tracking-widest transition-all">Semanas</button>
+                        <button id="view-days" onclick="renderLifeGrid('days')"
+                            class="view-btn px-6 py-2 rounded-full text-[10px] uppercase font-bold tracking-widest transition-all">DÍA</button>
                     </div>
 
                     <!-- Macro View Container (Grid) -->
                     <div id="macro-view-container" class="w-full flex-col items-center">
-                        <div
-                            class="flex gap-2 mb-8 glass p-1 rounded-full border border-white/5 bg-black/20 self-center">
-                            <button id="view-years" onclick="renderLifeGrid('years')"
-                                class="view-btn px-6 py-2 rounded-full text-[10px] uppercase font-bold tracking-widest transition-all">Años</button>
-                            <button id="view-months" onclick="renderLifeGrid('months')"
-                                class="view-btn px-6 py-2 rounded-full text-[10px] uppercase font-bold tracking-widest transition-all">Meses</button>
-                            <button id="view-weeks" onclick="renderLifeGrid('weeks')"
-                                class="view-btn px-6 py-2 rounded-full text-[10px] uppercase font-bold tracking-widest transition-all">Semanas</button>
-                        </div>
-
                         <div id="lifeGrid" class="w-full grid mx-auto relative px-4 pb-24">
                             <!-- Grid nodes and Decade markers will be injected here -->
                         </div>
@@ -236,63 +244,7 @@
                             </div>
                         </div>
 
-                        <!-- Frequency Mirror -->
-                        <div class="mirror-container w-full max-w-md mt-12 glass relative p-8 rounded-2xl">
-                            <div class="cyber-corner corner-tl"></div>
-                            <div class="cyber-corner corner-tr"></div>
-                            <div class="cyber-corner corner-bl"></div>
-                            <div class="cyber-corner corner-br"></div>
 
-                            <h4
-                                class="text-[10px] uppercase tracking-[0.4em] theme-text-dim mb-8 text-center font-bold">
-                                Espejo de Frecuencias Operativas</h4>
-                            <div class="space-y-6">
-                                <div class="space-y-2">
-                                    <div class="flex justify-between text-[8px] uppercase tracking-widest font-bold">
-                                        <span style="color: var(--color-focus)">Operación (Focus)</span>
-                                        <span id="mirror-val-op" class="theme-text-main">0%</span>
-                                    </div>
-                                    <div class="frequency-bar-bg">
-                                        <div id="mirror-fill-op" class="frequency-bar-fill"
-                                            style="width:0%; background: var(--color-focus); box-shadow: 0 0 10px var(--color-focus);">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="space-y-2">
-                                    <div class="flex justify-between text-[8px] uppercase tracking-widest font-bold">
-                                        <span style="color: var(--color-connection)">Conexión (Social)</span>
-                                        <span id="mirror-val-con" class="theme-text-main">0%</span>
-                                    </div>
-                                    <div class="frequency-bar-bg">
-                                        <div id="mirror-fill-con" class="frequency-bar-fill"
-                                            style="width:0%; background: var(--color-connection); box-shadow: 0 0 10px var(--color-connection);">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="space-y-2">
-                                    <div class="flex justify-between text-[8px] uppercase tracking-widest font-bold">
-                                        <span style="color: var(--color-vitality)">Vitalidad (BIO)</span>
-                                        <span id="mirror-val-vit" class="theme-text-main">0%</span>
-                                    </div>
-                                    <div class="frequency-bar-bg">
-                                        <div id="mirror-fill-vit" class="frequency-bar-fill"
-                                            style="width:0%; background: var(--color-vitality); box-shadow: 0 0 10px var(--color-vitality);">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="space-y-2">
-                                    <div class="flex justify-between text-[8px] uppercase tracking-widest font-bold">
-                                        <span style="color: var(--color-spirit)">Espíritu (Meta)</span>
-                                        <span id="mirror-val-chaos" class="theme-text-main">0%</span>
-                                    </div>
-                                    <div class="frequency-bar-bg">
-                                        <div id="mirror-fill-chaos" class="frequency-bar-fill"
-                                            style="width:0%; background: var(--color-spirit); box-shadow: 0 0 10px var(--color-spirit);">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>

@@ -217,12 +217,14 @@ function renderLifeGrid(mode) {
     }
     else if (mode === 'days') {
         // Toggle Containers
-        document.getElementById('macro-view-container').style.display = 'none';
-        document.getElementById('day-view-container').classList.remove('hidden');
-        document.getElementById('day-view-container').style.display = 'flex';
+        if (grid) grid.style.display = 'none';
+        const dayView = document.getElementById('day-view-container');
+        if (dayView) {
+            dayView.classList.remove('hidden');
+            dayView.style.display = 'flex';
+        }
 
         renderDayClock();
-        renderFrequencyMirror();
     }
 
     if (lived < 0) lived = 0;
@@ -255,9 +257,12 @@ function renderLifeGrid(mode) {
     if (mode === 'days') return;
 
     // Show Macro View
-    document.getElementById('macro-view-container').style.display = 'flex';
-    document.getElementById('day-view-container').style.display = 'none';
-    document.getElementById('day-view-container').classList.add('hidden');
+    if (grid) grid.style.display = 'grid';
+    const dayView = document.getElementById('day-view-container');
+    if (dayView) {
+        dayView.style.display = 'none';
+        dayView.classList.add('hidden');
+    }
 
     // Grid Layout Config
     grid.className = 'grid w-full mx-auto relative px-4 gap-2';
@@ -300,12 +305,12 @@ function renderLifeGrid(mode) {
         }
 
         if (i < lived) {
-            statusClass = 'past opacity-20 filter grayscale';
+            statusClass = 'past bg-cyan-500';
             if (anomaly) statusClass = `anomaly-${anomaly.type}`;
         } else if (i === lived) {
-            statusClass = 'present pulse-grid scale-110 z-10';
+            statusClass = 'present bg-white pulse-grid';
         } else {
-            statusClass = 'future bg-white/5 border border-white/5 hover:border-cyan-500/30 cursor-pointer';
+            statusClass = 'future bg-white/5 border border-white/5 cursor-pointer';
             if (anomaly) statusClass = `anomaly-${anomaly.type}`;
         }
 
