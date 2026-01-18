@@ -1,4 +1,4 @@
-const CACHE_NAME = 'neo-chronos-v2';
+const CACHE_NAME = 'neo-chronos-v3';
 const ASSETS = [
     './',
     './index.html',

@@ -141,42 +141,55 @@
                     </div>
                 </div>
 
-                <!-- Main Content (Stats + Grid) -->
-                <div id="life-main-content" class="flex flex-col items-center w-full h-full hidden">
-                    <div class="flex items-center space-x-2 mb-8">
-                        <button onclick="renderLifeGrid('years')" id="view-years"
-                            class="view-btn px-6 py-2 text-[10px] uppercase tracking-widest border border-white/10 rounded-full hover:bg-white/5 transition-colors">Años</button>
-                        <button onclick="renderLifeGrid('months')" id="view-months"
-                            class="view-btn px-6 py-2 text-[10px] uppercase tracking-widest border border-white/10 rounded-full hover:bg-white/5 transition-colors">Meses</button>
-                        <button onclick="renderLifeGrid('weeks')" id="view-weeks"
-                            class="view-btn px-6 py-2 text-[10px] uppercase tracking-widest border border-white/10 rounded-full hover:bg-white/5 transition-colors">Semanas</button>
-                        <button onclick="renderLifeGrid('days')" id="view-days"
-                            class="view-btn px-6 py-2 text-[10px] uppercase tracking-widest border border-white/10 rounded-full hover:bg-white/5 transition-colors">Días</button>
+                <!-- Main Content (Shows after birthdate) -->
+                <div id="life-main-content" class="flex-col items-center w-full h-full hidden relative animate-fade-in">
+                    <!-- Scanning Visual Overlay -->
+                    <div id="scan-overlay" class="scanning-line"></div>
+
+                    <div class="flex flex-wrap justify-center gap-4 mb-4 mt-6 w-full px-4">
+                        <div
+                            class="stat-card-premium glass p-4 rounded-xl border border-white/5 flex flex-col items-center w-32">
+                            <span class="text-[8px] uppercase tracking-widest text-white/40 mb-1">Densidad Vital</span>
+                            <span id="stat-percent" class="text-xl font-bold stat-value text-cyan-400">0%</span>
+                        </div>
+                        <div
+                            class="stat-card-premium glass p-4 rounded-xl border border-white/5 flex flex-col items-center w-32">
+                            <span id="stat-label" class="text-[8px] uppercase tracking-widest text-white/40 mb-1">Vida
+                                Recorrida</span>
+                            <span id="stat-lived" class="text-xl font-bold stat-value">0</span>
+                        </div>
+                        <!-- Potencial Restante: Card Crítica -->
+                        <div
+                            class="stat-card-premium stat-card-critical glass p-5 rounded-2xl border border-cyan-500/30 flex flex-col items-center w-40 relative">
+                            <div class="absolute top-2 right-2">
+                                <span class="relative flex h-2 w-2">
+                                    <span
+                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                                </span>
+                            </div>
+                            <span class="text-[9px] uppercase tracking-[0.2em] text-cyan-400 font-bold mb-1">PROYECCIÓN
+                                RESTANTE</span>
+                            <span id="stat-left" class="text-3xl font-black stat-value">0</span>
+                            <span class="text-[7px] text-cyan-300/50 mt-1 uppercase tracking-widest">Años de
+                                Acción</span>
+                        </div>
                     </div>
 
-                    <!-- Macro Views (Years, Months, Weeks) -->
-                    <div id="macro-view-container" class="w-full flex flex-col items-center">
-                        <div class="grid grid-cols-3 gap-6 mb-8 w-full max-w-3xl px-6">
-                            <div class="glass p-4 rounded-xl flex flex-col items-center border-b-2 border-cyan-500/30">
-                                <span class="text-[9px] uppercase text-white/40 tracking-[0.3em] mb-1">Densidad
-                                    Vital</span>
-                                <span id="stat-percent" class="text-3xl font-mono font-bold"
-                                    style="color: var(--accent);">0%</span>
-                            </div>
-                            <div class="glass p-4 rounded-xl flex flex-col items-center">
-                                <span id="stat-label"
-                                    class="text-[9px] uppercase text-white/40 tracking-[0.3em] mb-1">Cómputo
-                                    Actual</span>
-                                <span id="stat-lived" class="text-3xl font-mono font-bold text-white">0</span>
-                            </div>
-                            <div class="glass p-4 rounded-xl flex flex-col items-center">
-                                <span class="text-[9px] uppercase text-white/40 tracking-[0.3em] mb-1">Potencial
-                                    Restante</span>
-                                <span id="stat-left" class="text-3xl font-mono font-bold text-white/40">0</span>
-                            </div>
+                    <!-- Macro View Container (Grid) -->
+                    <div id="macro-view-container" class="w-full flex-col items-center">
+                        <div
+                            class="flex gap-2 mb-8 glass p-1 rounded-full border border-white/5 bg-black/20 self-center">
+                            <button id="view-years" onclick="renderLifeGrid('years')"
+                                class="view-btn px-6 py-2 rounded-full text-[10px] uppercase font-bold tracking-widest transition-all">Años</button>
+                            <button id="view-months" onclick="renderLifeGrid('months')"
+                                class="view-btn px-6 py-2 rounded-full text-[10px] uppercase font-bold tracking-widest transition-all">Meses</button>
+                            <button id="view-weeks" onclick="renderLifeGrid('weeks')"
+                                class="view-btn px-6 py-2 rounded-full text-[10px] uppercase font-bold tracking-widest transition-all">Semanas</button>
                         </div>
-                        <div id="lifeGrid"
-                            class="flex flex-wrap gap-[2px] justify-start content-start w-full max-w-5xl overflow-y-auto pb-20">
+
+                        <div id="lifeGrid" class="w-full grid mx-auto relative px-4 pb-24">
+                            <!-- Grid nodes and Decade markers will be injected here -->
                         </div>
                     </div>
 

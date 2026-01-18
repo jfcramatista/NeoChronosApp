@@ -148,6 +148,94 @@ body::after {
     transform: translateY(-2px);
 }
 
+/* Jerarquía de Estadísticas (V3.2) */
+.stat-card-premium {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.stat-card-critical {
+    border-bottom: 2px solid var(--accent) !important;
+    background: linear-gradient(to bottom, rgba(0, 242, 255, 0.05), transparent) !important;
+    transform: scale(1.05);
+    z-index: 10;
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.15);
+}
+
+.stat-card-critical .stat-value {
+    font-size: 2.5rem !important;
+    text-shadow: 0 0 15px var(--accent-glow);
+    color: var(--accent) !important;
+}
+
+/* Marcadores de Década */
+.decade-marker {
+    font-size: 8px;
+    font-weight: 800;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    padding-right: 10px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    grid-column: 1;
+}
+
+/* Animación de Escaneo Táctico */
+@keyframes scanningLine {
+    0% {
+        top: -10%;
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        top: 110%;
+        opacity: 0;
+    }
+}
+
+.scanning-line {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+    box-shadow: 0 0 15px var(--accent);
+    z-index: 50;
+    pointer-events: none;
+    display: none;
+}
+
+.is-scanning .scanning-line {
+    display: block;
+    animation: scanningLine 1s ease-in-out;
+}
+
+/* Grid Temporal Zonificado */
+.grid-node.past {
+    opacity: 0.2;
+    filter: grayscale(1);
+}
+
+.grid-node.present {
+    box-shadow: 0 0 15px var(--accent);
+    border: 1px solid white;
+    z-index: 5;
+    animation: hexPulseFast 2s infinite;
+}
+
+.grid-node.future {
+    background: var(--bg-hex-empty);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 /* Scrollbar Personalizada */
 ::-webkit-scrollbar {
     width: 4px;

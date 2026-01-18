@@ -131,6 +131,14 @@ function switchTab(id) {
         btn.style.color = 'var(--accent)';
     }
 
+    // Trigger Tactical Scan Animation
+    const mainContent = document.getElementById('life-main-content');
+    if (mainContent && !mainContent.classList.contains('hidden')) {
+        mainContent.classList.remove('is-scanning');
+        void mainContent.offsetWidth; // Force reflow
+        mainContent.classList.add('is-scanning');
+    }
+
     // Logic for Macro-Matrix (life)
     if (id === 'life') {
         const calibration = document.getElementById('life-calibration');
@@ -215,30 +223,52 @@ function renderLifeGrid(mode) {
 
         renderDayClock();
         renderFrequencyMirror();
-
-        // Active button state
-        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('bg-white/10', 'border-cyan-400', 'text-cyan-400'));
-        document.getElementById('view-days').classList.add('bg-white/10', 'border-cyan-400', 'text-cyan-400');
-        return;
     }
 
-    // Default: Show Macro View
+    if (lived < 0) lived = 0;
+
+    // Update Stats (UI Hierarchy Refined v3.2)
+    const lblEl = document.getElementById('stat-label');
+    const livedEl = document.getElementById('stat-lived');
+    const leftEl = document.getElementById('stat-left');
+    const percentEl = document.getElementById('stat-percent');
+
+    if (lblEl) lblEl.innerText = label || 'Vida Recorrida';
+    if (livedEl) livedEl.innerText = lived.toLocaleString();
+    if (leftEl) leftEl.innerText = (total - lived).toLocaleString();
+    if (percentEl) percentEl.innerText = ((lived / total) * 100).toFixed(1) + '%';
+
+    // Active button state
+    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('bg-white/10', 'border-cyan-400', 'text-cyan-400', 'text-white'));
+    const activeBtnId = (mode === 'days') ? 'view-days' : `view-${mode}`;
+    const activeBtn = document.getElementById(activeBtnId);
+    if (activeBtn) activeBtn.classList.add('bg-white/10', 'border-cyan-400', 'text-cyan-400');
+
+    // Trigger Tactical Scan Animation on view change
+    const mainContent = document.getElementById('life-main-content');
+    if (mainContent) {
+        mainContent.classList.remove('is-scanning');
+        void mainContent.offsetWidth;
+        mainContent.classList.add('is-scanning');
+    }
+
+    if (mode === 'days') return;
+
+    // Show Macro View
     document.getElementById('macro-view-container').style.display = 'flex';
     document.getElementById('day-view-container').style.display = 'none';
     document.getElementById('day-view-container').classList.add('hidden');
 
-    if (lived < 0) lived = 0;
+    // Grid Layout Config
+    grid.className = 'grid w-full mx-auto relative px-4 gap-2';
+    grid.style.maxWidth = (mode === 'years') ? '800px' : '1200px';
 
-    // Update Stats
-    document.getElementById('stat-label').innerText = label;
-    document.getElementById('stat-lived').innerText = lived.toLocaleString();
-    document.getElementById('stat-left').innerText = (total - lived).toLocaleString();
-    document.getElementById('stat-percent').innerText = ((lived / total) * 100).toFixed(1) + '%';
-
-    // Restoring to full-width as requested
-    grid.className = 'grid w-full animate-fade-in mx-auto';
-    grid.style.maxWidth = (mode === 'years') ? '800px' : 'none';
-    grid.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+    // Decade Markers logic: Add a column for markers if in years mode
+    if (mode === 'years') {
+        grid.style.gridTemplateColumns = `40px repeat(${cols}, minmax(0, 1fr))`;
+    } else {
+        grid.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+    }
     grid.style.gap = gap;
 
     const frag = document.createDocumentFragment();
@@ -270,13 +300,21 @@ function renderLifeGrid(mode) {
         }
 
         if (i < lived) {
-            statusClass = 'bg-cyan-500 opacity-60 hover:opacity-100 hover:bg-cyan-400';
+            statusClass = 'past opacity-20 filter grayscale';
             if (anomaly) statusClass = `anomaly-${anomaly.type}`;
         } else if (i === lived) {
-            statusClass = 'pulse-grid';
+            statusClass = 'present pulse-grid scale-110 z-10';
         } else {
-            statusClass = 'bg-white/5 border border-white/5 hover:border-cyan-500/30 cursor-pointer';
+            statusClass = 'future bg-white/5 border border-white/5 hover:border-cyan-500/30 cursor-pointer';
             if (anomaly) statusClass = `anomaly-${anomaly.type}`;
+        }
+
+        // Add Decade Marker if in years mode at the start of each decade (row)
+        if (mode === 'years' && i % cols === 0) {
+            const marker = document.createElement('div');
+            marker.className = 'decade-marker';
+            marker.innerText = `${i}y`;
+            frag.appendChild(marker);
         }
 
         d.className = `aspect-square transition-all duration-300 hex-shape hex-cell-macro ${statusClass}`;
