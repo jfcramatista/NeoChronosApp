@@ -137,13 +137,23 @@ function switchTab(id) {
         const mainContent = document.getElementById('life-main-content');
 
         if (!birth) {
-            calibration.classList.remove('hidden');
-            calibration.style.display = 'flex';
-            mainContent.classList.add('hidden');
+            if (calibration) {
+                calibration.classList.remove('hidden');
+                calibration.style.display = 'flex';
+            }
+            if (mainContent) {
+                mainContent.classList.add('hidden');
+                mainContent.style.display = 'none';
+            }
         } else {
-            calibration.classList.add('hidden');
-            mainContent.classList.remove('hidden');
-            mainContent.style.display = 'flex';
+            if (calibration) {
+                calibration.classList.add('hidden');
+                calibration.style.display = 'none';
+            }
+            if (mainContent) {
+                mainContent.classList.remove('hidden');
+                mainContent.style.display = 'flex';
+            }
 
             // Check current active view mode in buttons
             const activeBtn = document.querySelector('.view-btn.text-cyan-400');
@@ -309,6 +319,13 @@ function saveLifeCalibration() {
         if (dInput) dInput.value = valBirth;
         const eInput = document.getElementById('setup-expectancy');
         if (eInput) eInput.value = valExpectancy;
+
+        // Visual Transition: Clear the calibration portal immediately
+        const calibration = document.getElementById('life-calibration');
+        if (calibration) {
+            calibration.classList.add('hidden');
+            calibration.style.display = 'none';
+        }
 
         switchTab('life');
     } else {

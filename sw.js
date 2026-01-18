@@ -1,4 +1,4 @@
-const CACHE_NAME = 'neo-chronos-v1';
+const CACHE_NAME = 'neo-chronos-v2';
 const ASSETS = [
     './',
     './index.html',
@@ -9,17 +9,33 @@ const ASSETS = [
     './icons/icon-512x512.png'
 ];
 
-// 1. Fase de Instalación: Guardar archivos en la caché
+// 1. Fase de Instalación: Guardar archivos en el nuevo búnker
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log('Neo-Chronos: Archivos almacenados en búnker (caché).');
+            console.log('Neo-Chronos: Búnker v2 actualizado.');
             return cache.addAll(ASSETS);
         })
     );
 });
 
-// 2. Fase de Fetch: Servir desde caché si no hay red
+// 2. Fase de Activación: Eliminar búnkers viejos
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cache) => {
+                    if (cache !== CACHE_NAME) {
+                        console.log('Neo-Chronos: Borrando búnker antiguo:', cache);
+                        return caches.delete(cache);
+                    }
+                })
+            );
+        })
+    );
+});
+
+// 3. Fase de Fetch: Servir desde caché o red
 self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(event.request).then((response) => {
