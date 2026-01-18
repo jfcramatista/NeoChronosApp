@@ -449,7 +449,7 @@ function handleSessionTrigger() {
         const category = categorySelect.value;
 
         if (!task) {
-            alert("Sajor, necesitas describir tu actividad primero.");
+            alert("Comandante Sajor, defina el propósito de su intervención antes de proceder.");
             return;
         }
 
@@ -459,11 +459,9 @@ function handleSessionTrigger() {
         sessionStartTime = new Date();
 
         // Visual State: Active Session
-        btn.style.background = '#e67e80';
-        btn.style.color = 'white';
-        btn.classList.add('scanning');
-        btnText.innerText = "PARAR SESIÓN";
-        statusText.innerText = `EN MISIÓN: ${fullAction.toUpperCase()}`;
+        btn.classList.add('session-running', 'scanning');
+        btnText.innerText = "ABORTAR MISIÓN";
+        statusText.innerText = `EJECUTANDO: ${fullAction.toUpperCase()}`;
         statusText.style.color = 'var(--accent)';
 
         input.disabled = true;
@@ -489,11 +487,9 @@ function handleSessionTrigger() {
         sessionStartTime = null;
 
         // Visual State: Reset
-        btn.style.background = '';
-        btn.style.color = '';
-        btn.classList.remove('scanning');
-        btnText.innerText = "INICIAR SECUENCIA";
-        statusText.innerText = "Operación sellada con éxito.";
+        btn.classList.remove('session-running', 'scanning');
+        btnText.innerText = "EJECUTAR DESPLIEGUE";
+        statusText.innerText = "Operación sellada y archivada.";
         statusText.style.color = '#4ade80';
 
         input.disabled = false;
@@ -511,7 +507,7 @@ function handleSessionTrigger() {
 
         // Reset status after 3 seconds
         setTimeout(() => {
-            statusText.innerText = "Sistema en Espera";
+            statusText.innerText = "Sistema Standby";
             statusText.style.color = '';
         }, 3000);
     }

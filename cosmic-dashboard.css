@@ -572,6 +572,83 @@ body::after {
     animation: coreHeartbeat 4s ease-in-out infinite;
 }
 
+/* Panel de Despliegue Operativo (V3.4) */
+#tab-action select,
+#tab-action input {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+}
+
+.energy-btn.active,
+.pillar-btn.active {
+    background: rgba(0, 242, 255, 0.1) !important;
+    border-color: var(--accent) !important;
+    opacity: 1 !important;
+    transform: scale(1.05);
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.energy-btn i,
+.energy-btn span,
+.pillar-btn i,
+.pillar-btn span {
+    transition: all 0.3s ease;
+}
+
+#session-timer-display {
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+    font-variant-numeric: tabular-nums;
+}
+
+.session-running {
+    background: #e67eb9 !important;
+    box-shadow: 0 0 30px rgba(230, 126, 185, 0.4) !important;
+    animation: alertPulse 2s infinite;
+}
+
+@keyframes alertPulse {
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.2);
+    }
+}
+
+#tab-action {
+    padding-bottom: 120px !important;
+}
+
+#session-main-btn {
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 15px 40px -10px rgba(0, 242, 255, 0.4);
+}
+
+#session-main-btn:hover {
+    box-shadow: 0 20px 60px -5px rgba(0, 242, 255, 0.5);
+}
+
+/* Animación de pulso para el estado de sesión */
+#session-status-text {
+    animation: statusPulse 2s infinite;
+}
+
+@keyframes statusPulse {
+
+    0%,
+    100% {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 1;
+        color: var(--accent);
+    }
+}
+
 @keyframes coreHeartbeat {
 
     0%,

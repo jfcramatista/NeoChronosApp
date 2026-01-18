@@ -253,147 +253,143 @@
             <!-- Protocolo de Acción (Rayo) -->
 
             <!-- Tab: Protocolo de Acción -->
-            <section id="tab-action" class="tab-content flex-row p-6 w-full h-full items-stretch gap-6">
-                <!-- LEFT PANEL: Input Form (Compact) -->
-                <div class="w-1/3 flex flex-col space-y-4">
-                    <h3
-                        class="text-[10px] uppercase tracking-[0.4em] font-black theme-text-dim text-center pb-2 border-b border-white/10">
-                        Configuración de Misión</h3>
-
-                    <!-- Activity Input -->
-                    <div class="space-y-2">
-                        <label class="text-[8px] uppercase tracking-widest theme-text-dim font-bold">Actividad</label>
-                        <input id="current-activity-input" type="text" placeholder="¿En qué vas a trabajar?"
-                            class="w-full bg-black/40 border border-white/20 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-cyan-400 font-light transition-all">
+            <section id="tab-action" class="tab-content flex-col items-center p-6 w-full h-full overflow-y-auto">
+                <div class="max-w-xl w-full flex flex-col items-center space-y-8 mt-4">
+                    <!-- Cabecera de Comando -->
+                    <div class="text-center space-y-2">
+                        <h3 class="text-[12px] uppercase tracking-[0.6em] font-black theme-text-dim">Centro de
+                            Despliegue Operativo</h3>
+                        <div class="w-12 h-0.5 bg-cyan-500 mx-auto opacity-30"></div>
                     </div>
 
-                    <!-- Category -->
-                    <div class="space-y-2">
-                        <label class="text-[8px] uppercase tracking-widest theme-text-dim font-bold">Categoría</label>
-                        <select id="category-select"
-                            class="w-full bg-black/40 border border-white/20 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-cyan-400 transition-all cursor-pointer">
-                            <option value="">-- Sin categoría --</option>
-                            <option value="Universo Sonoro">🎵 Universo Sonoro</option>
-                            <option value="Programación">💻 Programación</option>
-                            <option value="Diseño">🎨 Diseño</option>
-                            <option value="Análisis">📊 Análisis</option>
-                            <option value="Gestión">📋 Gestión</option>
-                            <option value="Investigación">🔬 Investigación</option>
-                            <option value="Comunicación">📢 Comunicación</option>
-                        </select>
+                    <!-- Input Primario: Vector de Impacto -->
+                    <div class="w-full glass p-6 rounded-2xl border-cyan-500/10 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <label class="text-[9px] uppercase tracking-[0.3em] text-cyan-400 font-bold">Vector de
+                                Impacto</label>
+                            <span class="text-[7px] text-white/20 uppercase tracking-widest">Fase de Preparación</span>
+                        </div>
+                        <input id="current-activity-input" type="text"
+                            placeholder="Define el propósito de esta intervención..."
+                            class="w-full bg-black/20 border-b border-white/10 p-2 text-white text-lg focus:outline-none focus:border-cyan-500 font-light transition-all placeholder:text-white/10">
                     </div>
 
-                    <!-- Energy State -->
-                    <div class="space-y-2">
-                        <label class="text-[8px] uppercase tracking-widest theme-text-dim font-bold">Energía</label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button onclick="selectEnergy('low', this)"
-                                class="energy-btn p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all flex flex-col items-center gap-1 opacity-50">
-                                <span class="text-lg">🧊</span>
-                                <span class="text-[7px] uppercase font-bold">Baja</span>
-                            </button>
-                            <button onclick="selectEnergy('fluid', this)"
-                                class="energy-btn p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all flex flex-col items-center gap-1 opacity-50">
-                                <span class="text-lg">⚡</span>
-                                <span class="text-[7px] uppercase font-bold">Fluido</span>
-                            </button>
-                            <button onclick="selectEnergy('overload', this)"
-                                class="energy-btn p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all flex flex-col items-center gap-1 opacity-50">
-                                <span class="text-lg">🔥</span>
-                                <span class="text-[7px] uppercase font-bold">Carga</span>
-                            </button>
+                    <!-- Dashboard de Parámetros -->
+                    <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Selectores Izquierda -->
+                        <div class="space-y-6">
+                            <!-- Categoría -->
+                            <div class="space-y-3">
+                                <label class="text-[8px] uppercase tracking-widest theme-text-dim font-bold">Dominio
+                                    Táctico</label>
+                                <select id="category-select"
+                                    class="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white text-xs focus:outline-none focus:border-cyan-400 transition-all cursor-pointer">
+                                    <option value="">-- Sin asignar --</option>
+                                    <option value="Universo Sonoro">🎵 Universo Sonoro</option>
+                                    <option value="Programación">💻 Programación</option>
+                                    <option value="Diseño">🎨 Diseño</option>
+                                    <option value="Análisis">📊 Análisis</option>
+                                    <option value="Gestión">📋 Gestión</option>
+                                    <option value="Investigación">🔬 Investigación</option>
+                                    <option value="Comunicación">📢 Comunicación</option>
+                                </select>
+                            </div>
+
+                            <!-- Energía -->
+                            <div class="space-y-3">
+                                <label class="text-[8px] uppercase tracking-widest theme-text-dim font-bold">Fase de
+                                    Resonancia</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="selectEnergy('low', this)"
+                                        class="energy-btn p-3 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all flex flex-col items-center gap-1 opacity-50">
+                                        <span class="text-xl">🧊</span>
+                                        <span class="text-[7px] uppercase font-bold text-white/60">Baja</span>
+                                    </button>
+                                    <button onclick="selectEnergy('fluid', this)"
+                                        class="energy-btn p-3 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all flex flex-col items-center gap-1 opacity-50">
+                                        <span class="text-xl">⚡</span>
+                                        <span class="text-[7px] uppercase font-bold text-white/60">Fluido</span>
+                                    </button>
+                                    <button onclick="selectEnergy('overload', this)"
+                                        class="energy-btn p-3 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all flex flex-col items-center gap-1 opacity-50">
+                                        <span class="text-xl">🔥</span>
+                                        <span class="text-[7px] uppercase font-bold text-white/60">Carga</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Selectores Derecha: Esfera -->
+                        <div class="space-y-3">
+                            <label class="text-[8px] uppercase tracking-widest theme-text-dim font-bold">Área de
+                                Influencia</label>
+                            <div class="grid grid-cols-2 gap-2 h-[calc(100%-24px)]">
+                                <button onclick="selectPillar('pillar-op', this)"
+                                    class="pillar-btn p-4 rounded-xl bg-white/5 border border-white/5 flex flex-col items-center justify-center gap-2 active transition-all">
+                                    <span class="text-2xl">⚡</span>
+                                    <span class="text-[8px] uppercase font-black theme-text-dim">OPERACIÓN</span>
+                                </button>
+                                <button onclick="selectPillar('pillar-con', this)"
+                                    class="pillar-btn p-4 rounded-xl bg-white/5 border border-white/5 flex flex-col items-center justify-center gap-2 transition-all">
+                                    <span class="text-2xl">💎</span>
+                                    <span class="text-[8px] uppercase font-black theme-text-dim">CONEXIÓN</span>
+                                </button>
+                                <button onclick="selectPillar('pillar-vit', this)"
+                                    class="pillar-btn p-4 rounded-xl bg-white/5 border border-white/5 flex flex-col items-center justify-center gap-2 transition-all">
+                                    <span class="text-2xl">🌱</span>
+                                    <span class="text-[8px] uppercase font-black theme-text-dim">VITALIDAD</span>
+                                </button>
+                                <button onclick="selectPillar('pillar-chaos', this)"
+                                    class="pillar-btn p-4 rounded-xl bg-white/5 border border-white/5 flex flex-col items-center justify-center gap-2 transition-all">
+                                    <span class="text-2xl">🌀</span>
+                                    <span class="text-[8px] uppercase font-black theme-text-dim">ESPÍRITU</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Spheres -->
-                    <div class="space-y-2">
-                        <label class="text-[8px] uppercase tracking-widest theme-text-dim font-bold">Esfera</label>
-                        <div class="grid grid-cols-4 gap-2">
-                            <button onclick="selectPillar('pillar-op', this)"
-                                class="pillar-btn p-2 rounded-lg bg-white/5 border border-white/10 flex flex-col items-center gap-1 active hover:bg-white/10 transition-all">
-                                <span class="text-lg">⚡</span>
-                                <span class="text-[7px] uppercase font-bold theme-text-dim">Op</span>
-                            </button>
-                            <button onclick="selectPillar('pillar-con', this)"
-                                class="pillar-btn p-2 rounded-lg bg-white/5 border border-white/10 flex flex-col items-center gap-1 hover:bg-white/10 transition-all">
-                                <span class="text-lg">💎</span>
-                                <span class="text-[7px] uppercase font-bold theme-text-dim">Con</span>
-                            </button>
-                            <button onclick="selectPillar('pillar-vit', this)"
-                                class="pillar-btn p-2 rounded-lg bg-white/5 border border-white/10 flex flex-col items-center gap-1 hover:bg-white/10 transition-all">
-                                <span class="text-lg">🌿</span>
-                                <span class="text-[7px] uppercase font-bold theme-text-dim">Vit</span>
-                            </button>
-                            <button onclick="selectPillar('pillar-chaos', this)"
-                                class="pillar-btn p-2 rounded-lg bg-white/5 border border-white/10 flex flex-col items-center gap-1 hover:bg-white/10 transition-all">
-                                <span class="text-lg">🌀</span>
-                                <span class="text-[7px] uppercase font-bold theme-text-dim">Esp</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                    <!-- Cronómetro Táctico -->
+                    <div class="flex flex-col items-center space-y-6 w-full py-8">
+                        <div class="relative group">
+                            <!-- Glow circular de fondo -->
+                            <div
+                                class="absolute inset-0 bg-cyan-500/10 blur-[60px] rounded-full group-hover:bg-cyan-500/20 transition-all">
+                            </div>
 
-                <!-- RIGHT PANEL: Hexagon Progress + Timer + Controls -->
-                <div class="flex-1 flex flex-col items-center justify-center space-y-8">
-                    <!-- Creative Hexagonal Timer Display -->
-                    <div class="text-center space-y-4 mb-6">
-                        <p id="session-status-text" class="text-[9px] uppercase tracking-[0.3em] theme-text-dim">Sistema
-                            en Espera</p>
-
-                        <!-- Hexagonal Timer Container -->
-                        <div class="relative inline-block">
-                            <!-- Outer circle ring (seconds indicator) -->
-                            <svg width="200" height="200" viewBox="0 0 200 200" class="absolute"
-                                style="left: 50%; top: 50%; transform: translate(-50%, -50%);">
-                                <defs>
-                                    <linearGradient id="timerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#00f2ff;stop-opacity:1" />
-                                        <stop offset="100%" style="stop-color:#0088cc;stop-opacity:1" />
-                                    </linearGradient>
-                                </defs>
-                                <!-- Background circle -->
-                                <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(0,242,255,0.1)"
-                                    stroke-width="3" />
-                                <!-- Progress circle (seconds) -->
-                                <circle id="timer-progress-circle" cx="100" cy="100" r="90" fill="none"
-                                    stroke="url(#timerGradient)" stroke-width="3" stroke-dasharray="565.48"
-                                    stroke-dashoffset="565.48" transform="rotate(-90 100 100)"
-                                    style="transition: stroke-dashoffset 0.3s ease;" />
-                            </svg>
-
-                            <!-- Timer digits -->
-                            <div class="relative z-10 flex flex-col items-center justify-center py-16">
-                                <div class="flex items-baseline gap-1">
+                            <div class="relative z-10 flex flex-col items-center justify-center">
+                                <span id="session-status-text"
+                                    class="text-[9px] uppercase tracking-[0.5em] text-cyan-500/60 mb-4 font-bold">Sistema
+                                    Standby</span>
+                                <div class="flex items-baseline gap-2">
                                     <span id="session-timer-display"
-                                        class="text-5xl font-mono font-black tracking-wider"
-                                        style="color: var(--accent);">00:00</span>
-                                    <span id="session-timer-seconds" class="text-xl font-mono font-bold opacity-50"
-                                        style="color: var(--accent);">00</span>
-                                </div>
-                                <div
-                                    class="w-16 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mt-2 opacity-50">
+                                        class="text-7xl font-mono font-black tracking-normal text-white">00:00</span>
+                                    <span id="session-timer-seconds"
+                                        class="text-2xl font-mono font-bold opacity-30 text-white">00</span>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Botón de Ejecución -->
+                        <button id="session-main-btn" onclick="handleSessionTrigger()"
+                            class="group relative w-full max-w-sm py-8 bg-cyan-500 text-black text-[14px] uppercase font-black tracking-[0.8em] rounded-2xl overflow-hidden hover:scale-[1.03] active:scale-[0.98] transition-all shadow-[0_20px_50px_rgba(0,242,255,0.3)]">
+                            <span id="session-btn-text" class="relative z-10">EJECUTAR DESPLIEGUE</span>
+                            <div
+                                class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                            </div>
+                        </button>
                     </div>
 
-                    <!-- Hexagon Progress Grid -->
-                    <div id="hex-progress-container" class="hidden animate-fade-in">
+                    <!-- Historial Visual Rápido (Hex Grid) -->
+                    <div id="hex-progress-container" class="hidden w-full animate-fade-in">
                         <div class="flex flex-col items-center space-y-4">
-                            <p class="text-[8px] uppercase tracking-[0.5em] theme-text-dim font-bold">Flujo Temporal</p>
+                            <p class="text-[8px] uppercase tracking-[0.5em] theme-text-dim font-bold">Trazado de
+                                Secuencia</p>
                             <div id="hex-progress-grid"
-                                class="flex flex-wrap justify-center gap-4 max-w-2xl p-6 glass rounded-2xl border border-cyan-500/20">
-                                <!-- Hexagons dynamically added -->
+                                class="flex flex-wrap justify-center gap-3 p-4 glass rounded-2xl border border-white/5">
+                                <!-- Hexágonos de flujo -->
                             </div>
                         </div>
                     </div>
-
-                    <!-- Action Button -->
-                    <button id="session-main-btn" onclick="handleSessionTrigger()"
-                        class="group relative w-full max-w-md py-6 theme-bg-accent text-[13px] uppercase font-black tracking-[0.6em] rounded-xl overflow-hidden hover:scale-[1.02] active:scale-[0.99] transition-all shadow-xl shadow-cyan-500/20">
-                        <span id="session-btn-text" class="relative z-10">INICIAR SECUENCIA</span>
-                        <div class="btn-scan-line"></div>
-                    </button>
                 </div>
             </section>
 
