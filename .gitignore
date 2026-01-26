@@ -1,0 +1,19 @@
+# Secretos de Google (¡NUNCA SUBIR ESTO!)
+backend/credentials.json
+backend/token.json
+
+# Base de datos (Contiene tu vida privada)
+backend/neochronos.db
+
+# Gráficos de análisis (Opcional, pero mejor no subirlos)
+backend/analisis_pilares.png
+backend/reporte_conciencia.md
+
+# Basura de Python
+backend/__pycache__/
+*.pyc
+
+# Entornos virtuales (Si usas carpetas de entorno)
+.env
+venv/
+node_modules/

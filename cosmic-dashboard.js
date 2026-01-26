@@ -16,7 +16,8 @@ const PILLAR_COLORS = {
     'pillar-op': '#00f2ff',    // Neon Cyan (Operación)
     'pillar-con': '#ff007a',   // Neon Magenta (Conexión)
     'pillar-vit': '#39ff14',   // Neon Green (Vitalidad)
-    'pillar-chaos': '#f0f000'  // Neon Yellow (Espíritu)
+    'pillar-chaos': '#f0f000', // Neon Yellow (Espíritu)
+    'pillar-for': '#ffa500'    // Neon Amber (Forja)
 };
 const LS_KEY_THEME = 'neo-chronos-theme';
 
@@ -513,7 +514,7 @@ function handleSessionTrigger() {
     }
 }
 
-function saveSessionData(task, start, end, duration, pillar, energy) {
+async function saveSessionData(task, start, end, duration, pillar, energy) {
     const dayData = JSON.parse(localStorage.getItem(LS_KEY_DAY_DATA) || '{}');
     const todayStr = new Date().toISOString().split('T')[0];
 
@@ -530,6 +531,44 @@ function saveSessionData(task, start, end, duration, pillar, energy) {
 
     localStorage.setItem(LS_KEY_DAY_DATA, JSON.stringify(dayData));
     renderFrequencyMirror();
+
+    // --- Mapeo de Nomenclatura Estratégica ---
+    const pillarMap = {
+        'pillar-op': 'Operación',
+        'pillar-con': 'Conexión',
+        'pillar-vit': 'Vitalidad',
+        'pillar-chaos': 'Espíritu',
+        'pillar-for': 'Forja'
+    };
+    const resonanceMap = { 'low': 'Baja', 'fluid': 'Fluido', 'overload': 'Carga' };
+
+    // Limpiar nombre de actividad (quitar la categoría si viene en [corchetes])
+    let cleanTask = task.replace(/^\[.*?\]\s*/, '');
+    let cat = (typeof selectedCategory !== 'undefined' && selectedCategory) ? selectedCategory : "General";
+
+    // --- El Puente: Envío al Servidor Python (Esquema Refactorizado) ---
+    const sessionData = {
+        activity: cleanTask,
+        category: cat,
+        resonance: resonanceMap[energy] || "No Definida",
+        pillar: pillarMap[pillar] || "General",
+        start_time: start,
+        end_time: end,
+        duration: parseInt(duration),
+        timestamp: new Date().toISOString()
+    };
+
+    try {
+        const response = await fetch('http://127.0.0.1:8000/api/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sessionData)
+        });
+        const result = await response.json();
+        console.log('✅ Operación Archivada en SQL:', result);
+    } catch (error) {
+        console.warn('⚠️ Fallo en el enlace neural. Los datos solo residen en localStorage.');
+    }
 }
 
 function renderDayClock() {
@@ -609,7 +648,13 @@ function showBitacora(h) {
         timeField.innerText = session.time;
         durField.innerText = `${session.duration} min`;
 
-        const pillarNames = { 'pillar-op': 'Operación', 'pillar-con': 'Conexión', 'pillar-vit': 'Vitalidad', 'pillar-chaos': 'Espíritu' };
+        const pillarNames = {
+            'pillar-op': 'Operación',
+            'pillar-con': 'Conexión',
+            'pillar-vit': 'Vitalidad',
+            'pillar-chaos': 'Espíritu',
+            'pillar-for': 'Forja'
+        };
         if (pilarField) pilarField.innerText = pillarNames[session.pillar] || 'General';
         if (energyField) energyField.innerText = ENERGY_ICONS[session.energy] || '---';
     } else {
